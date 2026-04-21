@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>NYC & Washington DC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+button{outline:none;-webkit-appearance:none;appearance:none}
+button:focus{outline:none}
+input:focus,select:focus,textarea:focus{outline:none}
+a{-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#f8f7f4;
+  --card:#ffffff;
+  --text:#1a1a1a;
+  --text2:#555;
+  --text3:#999;
+  --border:#e5e3de;
+  --border2:#edebe8;
+}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px}
+h1,h2{font-family:'DM Serif Display',Georgia,serif}
+
+/* ── HEADER ── */
+.header{padding:20px 16px 12px;background:var(--card);border-bottom:1px solid var(--border)}
+.header h1{font-size:22px;letter-spacing:-0.5px;margin-bottom:2px}
+.header .sub{font-size:12px;color:var(--text2);margin-bottom:8px}
+.hotel-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#c0392b;background:#fef3f2;border:1px solid #fecaca;border-radius:20px;padding:4px 10px}
+
+/* ── DAY SELECTOR ── */
+.day-nav{padding:14px 16px 0;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.city-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.day-pills{display:flex;gap:6px;overflow-x:auto;padding-bottom:14px;scrollbar-width:none}
+.day-pills::-webkit-scrollbar{display:none}
+.day-pill{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1px solid #e5e3de;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;transition:all .15s;background:#fff;color:#555;outline:none;-webkit-appearance:none}
+.day-pill.active{color:#fff;border-color:transparent}
+
+/* ── TABS ── */
+.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--card);overflow-x:auto;scrollbar-width:none;position:sticky;top:69px;z-index:99}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:10px 14px;font-size:12px;font-weight:500;color:#999;border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;outline:none;-webkit-appearance:none}
+.tab.active{color:var(--day-color,#378ADD);border-bottom-color:var(--day-color,#378ADD)}
+
+/* ── DAY HEADER ── */
+.day-header{margin:12px 12px 0;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px}
+.day-num{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0}
+.day-name{font-size:15px;font-weight:600;flex:1}
+.day-date{font-size:12px;opacity:.75;margin-top:1px}
+.city-tag{font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;flex-shrink:0}
+
+/* ── CONTEXT BLOCK ── */
+.ctx-block{margin:10px 12px 0;border-radius:10px;overflow:hidden}
+.ctx-head{padding:11px 14px;cursor:pointer;display:flex;align-items:center;gap:8px;user-select:none}
+.ctx-head span.title{font-size:12px;font-weight:600;flex:1}
+.ctx-head span.toggle{font-size:11px;font-weight:600}
+.ctx-body{padding:0 14px 14px;border-top:1px solid}
+.ctx-body p{font-size:12px;line-height:1.7;margin-top:10px;opacity:.85}
+
+/* ── PLACE CARDS ── */
+.places{padding:10px 12px;display:flex;flex-direction:column;gap:7px}
+.place-card{border-radius:11px;border:1px solid #e8e8e8;background:#ffffff;overflow:hidden;cursor:pointer;transition:background .2s,border-color .15s}
+.place-card.open{border-color:var(--day-color,#378ADD)}
+.place-card.custom-place{border-style:dashed;border-color:var(--day-color,#378ADD);opacity:.9}
+.place-head{padding:11px 13px;display:flex;align-items:center;gap:10px}
+.place-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;border:1px solid}
+.place-title{font-size:14px;font-weight:500;color:var(--text)}
+.place-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px;align-items:center}
+.badge{font-size:10px;padding:2px 7px;border-radius:8px;font-weight:500}
+.badge-day{border:1px solid}
+.badge-nearby{background:#fff8e1;color:#8b6200;border:1px solid #f0c04044;font-size:10px;padding:2px 7px;border-radius:8px;font-weight:500}
+.badge-custom{background:#f0f9ff;color:#0369a1;border:1px solid #bae6fd}
+.place-hint{font-size:11px;color:var(--text3);margin-top:2px}
+.place-chevron{font-size:13px;margin-left:auto;flex-shrink:0;color:var(--text3)}
+.place-detail{padding:10px 13px 14px;border-top:1px solid transparent}
+.place-detail p{font-size:13px;line-height:1.65;margin-top:0}
+.nearby-section{margin-top:12px;padding-top:10px;border-top:1px solid var(--border2)}
+.nearby-label{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:7px;display:flex;align-items:center;gap:5px}
+.nearby-item{background:#f8f7f4;border-radius:8px;padding:8px 10px;margin-bottom:5px;border:1px solid var(--border)}
+.nearby-item-head{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px}
+.nearby-item-name{font-size:11px;font-weight:600;color:var(--text)}
+.nearby-item-type{font-size:10px;padding:1px 6px;border-radius:6px;background:#fff;border:1px solid var(--border);color:var(--text2)}
+.nearby-item-note{font-size:11px;color:var(--text2);line-height:1.5}
+.place-actions{display:flex;gap:6px;margin-top:10px}
+.btn-sm{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--text2)}
+.btn-sm.delete{color:#e74c3c;border-color:#fecaca}
+
+/* ── ADD PLACE BUTTON ── */
+.add-place-btn{margin:0 12px 10px;width:calc(100% - 24px);padding:11px;border-radius:10px;border:1.5px dashed;background:transparent;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s}
+
+/* ── EXPENSES ── */
+.exp-summary{margin:10px 12px 0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.exp-card{border-radius:10px;padding:12px 14px}
+.exp-card .label{font-size:11px;opacity:.7;margin-bottom:3px}
+.exp-card .amount{font-size:22px;font-weight:600}
+.exp-cats{margin:10px 12px 0;border-radius:10px;border:1px solid var(--border);overflow:hidden;background:var(--card)}
+.exp-cat{padding:10px 14px;border-bottom:1px solid var(--border2)}
+.exp-cat:last-child{border-bottom:none}
+.exp-cat-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.exp-cat-name{font-size:13px;font-weight:500;flex:1}
+.exp-cat-total{font-size:13px;font-weight:600}
+.exp-item{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:7px;background:#f8f7f4;margin-bottom:4px}
+.exp-item-desc{font-size:12px;color:var(--text2);flex:1}
+.exp-item-amt{font-size:12px;font-weight:500;color:var(--text);flex-shrink:0}
+.exp-empty{text-align:center;padding:32px;color:var(--text3);font-size:13px}
+.add-exp-btn{margin:10px 12px;width:calc(100% - 24px);padding:11px;border-radius:10px;border:1.5px dashed;background:transparent;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+
+/* ── MAP ── */
+#map-container,#map-all-container{margin:10px 12px 0;border-radius:12px;overflow:hidden;border:1px solid var(--border);height:min(420px,60vh);min-height:280px}
+.map-legend{margin:10px 12px 0;font-size:11px;color:var(--text3)}
+.map-tip{display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid var(--border);border-radius:6px;padding:4px 9px;margin-bottom:8px}
+.legend-items{display:flex;gap:10px;flex-wrap:wrap}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* ── MODALS ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:flex-end;justify-content:center;z-index:9999;padding:0}
+.modal-box{background:#fff;border-radius:18px 18px 0 0;padding:20px 20px 36px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 -4px 24px rgba(0,0,0,.15)}
+.modal-box h3{font-size:16px;font-weight:600;color:#1a1a1a;margin-bottom:16px}
+.modal-field{margin-bottom:13px}
+.modal-field label{display:block;font-size:12px;color:#555;margin-bottom:4px;font-weight:500}
+.modal-field input,.modal-field textarea,.modal-field select{width:100%;padding:10px 12px;border-radius:9px;border:1.5px solid #e0e0e0;background:#fafafa;color:#1a1a1a;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
+.modal-field input:focus,.modal-field textarea:focus,.modal-field select:focus{border-color:#378ADD;background:#fff}
+.modal-field textarea{resize:vertical;min-height:70px}
+.modal-icon-row{display:flex;gap:8px}
+.modal-icon-row input:first-child{width:48px;text-align:center;font-size:20px;flex-shrink:0;padding:10px 6px}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.btn-cancel{padding:10px 18px;border-radius:9px;border:1.5px solid #e0e0e0;background:transparent;color:#555;font-size:14px;cursor:pointer;font-family:inherit}
+.btn-save{padding:10px 20px;border-radius:9px;border:none;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s}
+.btn-save:disabled{opacity:.4;cursor:default}
+.cat-pills{display:flex;gap:6px;flex-wrap:wrap}
+.cat-pill{padding:8px 12px;border-radius:20px;border:1.5px solid #e0e0e0;font-size:12px;cursor:pointer;background:#f5f5f5;color:#555;transition:background .15s,color .15s,border-color .15s;font-family:inherit;display:inline-block;-webkit-appearance:none;outline:none;user-select:none}
+
+/* ── HIDE/SHOW ── */
+.tab-content{display:none}
+.tab-content.visible{display:block}
+
+.doc-btn{background:none;border:1px solid #e0e0e0;border-radius:7px;cursor:pointer;font-size:12px;padding:4px 9px;color:#555;display:inline-flex;align-items:center;gap:4px;line-height:1;margin-top:0}
+.doc-btn.has-docs{background:#fff8e1;border-color:#f0c040;color:#8b6200;font-weight:600}
+.doc-list{margin-top:8px;display:flex;flex-direction:column;gap:5px}
+.doc-item{display:flex;align-items:center;gap:8px;background:#f8f7f4;border:1px solid #e5e3de;border-radius:8px;padding:7px 10px}
+.doc-item-name{font-size:12px;color:#111;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.doc-item-open{font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid #ddd;background:#fff;cursor:pointer;color:#378ADD;font-weight:500;white-space:nowrap}
+.doc-item-del{font-size:11px;padding:3px 7px;border-radius:6px;border:1px solid #fecaca;background:none;cursor:pointer;color:#e74c3c}
+.doc-modal-box{background:#fff;border-radius:18px 18px 0 0;padding:20px 20px 36px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;box-shadow:0 -4px 24px rgba(0,0,0,.15)}
+.doc-preview{width:100%;min-height:60vh;border:none;border-radius:10px;background:#f5f5f5}
+
+.place-check{width:24px;height:24px;border-radius:50%;border:2px solid #ddd;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:all .2s;font-size:13px;background:#fff}
+.place-check.done{background:#22c55e;border-color:#22c55e;color:#fff}
+.progress-bar-wrap{margin:8px 12px 0;background:#e8e8e8;border-radius:20px;height:5px;overflow:hidden}
+.progress-bar-fill{height:100%;border-radius:20px;transition:width .4s ease}
+.progress-label{margin:5px 12px 0;font-size:11px;color:#888;font-weight:500}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Nueva York & Washington D.C.</h1>
+  <div class="sub">22 – 30 de abril · 8 días · 2 ciudades</div>
+  <div class="hotel-badge">🏨 TownePlace Suites · 324 W 44th St</div>
+</div>
+
+<div class="day-nav" id="dayNav">
+  <div class="city-label">🗽 Nueva York</div>
+  <div class="day-pills" id="nycPills"></div>
+  <div class="city-label" style="margin-top:8px">🏛 Washington D.C.</div>
+  <div class="day-pills" id="dcPills"></div>
+</div>
+
+<div id="app"></div>
+
+<!-- MODAL: Add Place -->
+<div class="modal-overlay" id="addModal" style="display:none" onclick="if(event.target===this)closeAddModal()">
+  <div class="modal-box">
+    <h3 id="addModalTitle">Añadir sitio</h3>
+    <div class="modal-field">
+      <label>Día</label>
+      <select id="addDay"></select>
+    </div>
+    <div class="modal-field">
+      <label>Nombre *</label>
+      <div class="modal-icon-row">
+        <input type="text" id="addIcon" placeholder="⭐" maxlength="2" value="⭐">
+        <input type="text" id="addName" placeholder="Nombre del sitio">
+      </div>
+    </div>
+    <div class="modal-field">
+      <label>Descripción</label>
+      <textarea id="addInfo" placeholder="Detalles, horarios, precio..."></textarea>
+    </div>
+    <div class="modal-field">
+      <label>Etiqueta (opcional)</label>
+      <input type="text" id="addBadge" placeholder="Ej: Gratis · $25 · ⚠ Reserva">
+    </div>
+    <div class="modal-field">
+      <label>Coordenadas (opcional, para el mapa)</label>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="addLat" placeholder="Latitud (40.7580)">
+        <input type="text" id="addLng" placeholder="Longitud (-73.985)">
+      </div>
+      <div style="font-size:11px;color:#999;margin-top:4px">Google Maps → clic derecho → copiar coordenadas</div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeAddModal()">Cancelar</button>
+      <button class="btn-save" id="addSaveBtn" onclick="savePlace()">Añadir sitio</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Add Expense -->
+<div class="modal-overlay" id="expModal" style="display:none" onclick="if(event.target===this)closeExpModal()">
+  <div class="modal-box">
+    <h3 id="expModalTitle">Añadir gasto</h3>
+    <div class="modal-field">
+      <label>Categoría</label>
+      <div class="cat-pills" id="catPills"></div>
+    </div>
+    <div class="modal-field">
+      <label>Descripción *</label>
+      <input type="text" id="expDesc" placeholder="Ej: Almuerzo en Grand Central Oyster Bar">
+    </div>
+    <div class="modal-field" style="display:flex;gap:8px">
+      <div style="flex:1">
+        <label>Importe *</label>
+        <input type="number" id="expAmount" step="0.01" min="0" placeholder="0.00">
+      </div>
+      <div style="width:100px">
+        <label>Moneda</label>
+        <select id="expCurrency">
+          <option value="USD">USD $</option>
+          <option value="EUR">EUR €</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeExpModal()">Cancelar</button>
+      <button class="btn-save" id="expSaveBtn" onclick="saveExpense()">Añadir</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const HOTEL = { lat: 40.7588, lng: -74.0002, n: "🏨 Hotel – TownePlace Suites", info: "324 West 44th St, Hell's Kitchen. A 7 min andando de Times Square, cerca de Broadway y Port Authority Bus Terminal." };
+
+const DAY_CONTEXT = {
+  0: {
+    title: "Times Square: de plaza de periódicos a «la pantalla del mundo»",
+    text: "Times Square parece el centro natural de Nueva York, pero es una construcción cultural. Fue una zona de teatros y prensa que acabó convirtiéndose en el gran escaparate luminoso del planeta. Su identidad cambió con la llegada del periódico, la publicidad, los teatros... y luego el «renacimiento» urbano de los 90 que la transformó en lo que hoy conocemos. Es casi el ejemplo perfecto de cómo Nueva York crea símbolos: una intersección se vuelve mito. Cuando lo visites de noche y de día notarás que parecen dos lugares distintos — eso no es casualidad, es la ciudad reinventándose a cada hora."
+  },
+  1: {
+    title: "Midtown vertical: Art Déco, orgullo corporativo y el cielo como terreno",
+    text: "El Midtown que recorres hoy es literalmente el capítulo en que Nueva York inventa la verticalidad. La ciudad no creció hacia arriba solo por ambición, sino por una mezcla de tecnología y economía: acero + ascensor + suelo carísimo = rascacielos. El Chrysler es el mejor ejemplo de esa época: Art Déco, elegante, casi joya — representa la «era de los titanes», empresas queriendo dejar huella en el skyline. El Empire State es el símbolo definitivo de ese impulso. Grand Central es una lección aparte: una estación diseñada como un palacio, porque en esa época viajar tenía ritual. Y el Rockefeller Center cuenta otra historia: un complejo pensado para mezclar trabajo, ocio y espectáculo — por eso es tan cinematográfico, nació para ser escenario."
+  },
+  2: {
+    title: "11-S, Wall Street y el puerto original: la Nueva York más antigua",
+    text: "Hoy pisas la Nueva York original. Antes de ser «New York» fue Nueva Ámsterdam, un puesto holandés construido para comerciar. El Distrito Financiero conserva ese espíritu aunque haya cambiado el decorado: las calles son más estrechas y torcidas que en Midtown porque son anteriores a la cuadrícula. Aquí también está el lugar donde Nueva York gestiona su historia más dolorosa: el Memorial del 11-S no intenta ocultar la herida, la convierte en forma — dos vacíos enormes que insisten en la ausencia. No es un monumento «para mirar», es un monumento para sentir. El Oculus, al lado, representa el capítulo opuesto: la reconstrucción como símbolo contemporáneo."
+  },
+  3: {
+    title: "Brooklyn, la inmigración y los barrios en capas",
+    text: "Cruzar el Brooklyn Bridge no es solo una caminata bonita: es atravesar el momento en que la ciudad se volvió una sola metrópolis. DUMBO es un ejemplo perfecto de «capas»: antes fue zona industrial, hoy es uno de los barrios más deseados de Brooklyn. Chinatown y Little Italy muestran cómo Nueva York no absorbió a los inmigrantes borrándolos, sino apilándolos: barrio sobre barrio, generación sobre generación. Chinatown creció y se expandió; Little Italy se fue encogiendo. Caminar por Canal Street o Mott Street no es solo comprar cosas — es ver cómo Nueva York cambia sin pedir permiso. La ciudad del «sueño americano» también tuvo una cara durísima: hacinamiento, trabajos agotadores... y de esa presión salió la energía que la define."
+  },
+  4: {
+    title: "Central Park: el gran truco urbano",
+    text: "Central Park parece naturaleza, pero es una de las ideas más potentes de la ciudad: fabricar un paisaje dentro de la metrópolis. En una ciudad obsesionada con el aprovechamiento del suelo, reservar un espacio gigantesco para «no construir» fue un acto de visión extraordinario. La parte histórica —y un poco incómoda— es que para crear el parque se desplazaron comunidades enteras que vivían aquí. Contarlo no estropea la visita: la hace más real. Nueva York no es solo postal; es conflicto, decisiones y consecuencias. Dentro, cada rincón tiene aura de película porque ha sido usado como símbolo de lo mismo una y otra vez: pausa, romance, misterio, infancia."
+  },
+  7: {
+    title: "La reinvención moderna: West Village, Chelsea y el borde del río",
+    text: "El West Village es el Manhattan que sobrevivió a la cuadrícula. Sus calles son curvas, diagonales, pequeñas — guardan la sensación de ciudad europea dentro de una metrópolis geométrica. Pasear por Washington Square Park y perderte por el Village es como caminar por un recuerdo. Chelsea y el High Line son el Nueva York del siglo XXI: la ciudad que recicla su pasado industrial y lo convierte en experiencia. Una vía elevada de tren se transforma en parque, paseo y galería al aire libre — urbanismo con narrativa: «esto era hierro; ahora es vida». Hudson Yards es el contraste: lo nuevo, lo brillante, lo enorme. La ciudad moviéndose entre sus dos impulsos eternos: conservar capas y construir futuro."
+  }
+};
+
+
+const DAYS = [
+  // ───── DÍA 0 ─────
+  {
+    id: 0, label: "Día 0", color: "#378ADD", bg: "#E6F1FB", textColor: "#0C447C",
+    date: "Mié 22 abril", name: "Llegada · Midtown", city: "NYC",
+    route: [[40.7588,-74.0002],[40.7505,-73.9934],[40.7484,-73.9857],[40.7580,-73.9855]],
+    via: "8th Ave sur → Empire State → 7th Ave norte",
+    places: [
+      { n: "Madison Square Garden", lat: 40.7505, lng: -73.9934, icon: "🏟",
+        info: "A 25 min andando del hotel por la 8th Ave. Inaugurado en 1968, es el pabellón deportivo más famoso del mundo — apodado «The World's Most Famous Arena». Sede permanente de los NY Knicks y los Rangers. Aquí se disputó el legendario combate Ali vs. Frazier en 1971, una de las noches más importantes del deporte del siglo XX. También escenario del primer concierto de Elvis en NY, de Sinatra, de Springsteen, de Madonna. Dato curioso: es el cuarto Madison Square Garden — los tres anteriores estaban en otros lugares de la ciudad, y ninguno estaba en Madison Square. Solo exterior.",
+        badge: null,
+        nearby: [{"n": "Friedman's", "type": "🍳 Brunch", "note": "450 10th Ave. Cocina americana, famoso por sus Eggs Benedict y avocado toast. 100% sin gluten."}, {"n": "Carmine's Times Square", "type": "🍝 Cena", "note": "200 W 44th St. Italiano familiar en raciones gigantes para compartir. Perfecto para grupos."}]
+      },
+      { n: "Empire State Building", lat: 40.7484, lng: -73.9857, icon: "🏢",
+        info: "A 7 min desde Madison Square. 102 pisos, 443 m con antena, ascensores a 120 km/h. Construido en solo 410 días (1930-1931) durante la Gran Depresión — cuando se terminó, tan pocos podían pagar las oficinas que lo llamaban «Empty State Building». Fue el más alto del mundo durante 40 años. Dato escalofriante: en 1945, un bombardero B-25 del ejército se perdió en la niebla sobre Manhattan y se estrelló contra el piso 79; murieron 14 personas, pero el edificio abrió al público dos días después. La iluminación nocturna cambia según la ocasión — el rojo y el verde de Navidad, el rojo de San Valentín, los colores del arcoíris en el orgullo. Mirador piso 86: vistas 360°, ~41€. En principio solo exterior.",
+        badge: "~41€ mirador",
+        nearby: [{"n": "Macy's Herald Square", "type": "🛍 Gran almacén desde 1902", "note": "151 W 34th St, a 3 min andando. El gran almacén más grande del mundo en superficie — 200.000 m². Inaugurado en 1902, tiene 11 plantas. El desfile de Thanksgiving de Macy's existe desde 1924."}, {"n": "Num Pang Kitchen", "type": "🥖 Sándwiches cambodgeses", "note": "140 E 41st St. Sándwiches cambodgeses de culto en NYC — el de barriga de cerdo es legendario."}, {"n": "Los Tacos No. 1", "type": "🌮 Tacos", "note": "229 W 43rd St. Los mejores tacos de Midtown, tortillas hechas a mano."}]
+      },
+      { n: "Times Square", lat: 40.7580, lng: -73.9855, icon: "✦",
+        info: "Visitar de día Y de noche — parecen dos lugares distintos. En los años 70 y 80, Times Square era la zona más peligrosa de la ciudad: prostitución, tráfico de drogas, sex shops. La transformación que la convirtió en lo que ves hoy fue una de las apuestas urbanísticas más arriesgadas de la historia moderna de Nueva York. La Torre One Times (25 pisos) fue sede del New York Times hasta 1912 y hoy acoge la bola del Año Nuevo — la tradición del ball drop existe desde 1907. La pantalla digital más grande mide casi 100m de largo × 23m de alto. Entre las 23:57 y las 00:00 hay una exposición de arte digital sincronizada en todas las pantallas. Foto en las escaleras rojas del TKTS. En la 46th con Broadway hay una rejilla en el suelo que vibra — obra de arte de Max Neuhaus llamada «Times Square» (lleva décadas ahí y casi nadie la oye con el ruido). En la 46th con la 7th está el Israel Miller's Shoe Store, donde estaba la agencia de Estelle (la representante de Joey en Friends). Ellen's Stardust Diner a 4 min: camareros actores que hacen show musical. The Knickerbocker Hotel fue el lugar donde se inventó el cóctel Martini, según la leyenda. Ver también la estación de metro de Times Square (42nd Street): interior digno de Broadway, lleno de obras de arte.",
+        badge: "Día + Noche",
+        nearby: [{"n": "Ellen's Stardust Diner", "type": "🎭 Experiencia", "note": "1650 Broadway. Los camareros son actores aspirantes a Broadway y hacen show musical mientras sirven."}, {"n": "Masseria Caffé & Bakery", "type": "☕ Café", "note": "56 W 45th St. El mejor café y croissants de la zona según los locales."}, {"n": "Restaurant Row (46th St)", "type": "🍽 Cena", "note": "46th St entre 8th y 9th Ave. Más de 20 restaurantes en una manzana — italiana, francesa, japonesa, caribeña."}]
+      },
+    ]
+  },
+
+  // ───── DÍA 1 ─────
+  {
+    id: 1, label: "Día 1", color: "#1D9E75", bg: "#E1F5EE", textColor: "#085041",
+    date: "Jue 23 abril", name: "Norte de Midtown", city: "NYC",
+    route: [[40.7588,-74.0002],[40.7580,-73.9855],[40.7587,-73.9787],[40.7600,-73.9800],[40.7586,-73.9762],[40.7614,-73.9776],[40.7624,-73.9738],[40.7495,-73.9660],[40.7534,-73.9768],[40.7516,-73.9755],[40.7508,-73.9751],[40.7533,-73.9823],[40.7530,-73.9826],[40.7528,-73.9787]],
+    via: "Hotel → 6th Ave → 5th Ave → ONU → Park Ave → 42nd St",
+    places: [
+      { n: "Rockefeller Center", lat: 40.7587, lng: -73.9787, icon: "🏙",
+        info: "A 7 min de Times Square. 19 edificios comerciales levantados entre 1930 y 1939 durante la Gran Depresión — un acto de fe económica casi suicida por parte de John D. Rockefeller Jr., que gastó 250 millones de dólares cuando el país estaba en la ruina. El proyecto dio trabajo a 75.000 personas. El famoso árbol de Navidad lleva en la plaza desde 1931, cuando los trabajadores de la construcción colocaron un pequeño abeto para celebrar que seguían teniendo empleo. En las paredes del interior encontrarás murales de José María Sert — el artista catalán fue contratado después de que Diego Rivera pintara un mural con Lenin que Rockefeller mandó destruir, en uno de los escándalos artísticos más sonados del siglo XX. El Top of the Rock (mirador piso 70, ~37€) ofrece las mejores vistas del Empire State — lo ves entero, algo que desde el propio Empire no puedes hacer.",
+        badge: "~37€ Top of Rock",
+        nearby: [{"n": "Bluestone Lane (Times Sq)", "type": "☕ Café", "note": "11 Times Square. Cadena australiana con los mejores flat whites de Midtown."}]
+      },
+      { n: "Radio City Music Hall", lat: 40.7600, lng: -73.9800, icon: "🎭",
+        info: "Inaugurado el 27 de diciembre de 1932 en plena Gran Depresión, con más de 6.000 butacas. En su primera semana tuvo cuatro funciones diarias con la Rockettes — el conjunto de bailarinas que sigue actuando hoy. Durante décadas fue el primer destino turístico de Manhattan. Su Gran Sala Art Déco es una de las más bellas del mundo: el techo simula el sol al atardecer con rayos de oro y azul que se irradian sobre el patio de butacas, creando la ilusión de estar al aire libre. Los murales de la entrada los encargaron originalmente a Diego Rivera, que fue despedido del Rockefeller Center por sus ideas comunistas — los murales finales los pintó otro artista. Hay tours del interior (~$30). Si solo ves el exterior, fíjate en los letreros de neón originales.",
+        badge: null },
+      { n: "Catedral de San Patricio", lat: 40.7586, lng: -73.9762, icon: "⛪",
+        info: "Principal templo católico de NY, construido entre 1858 y 1878 en estilo neogótico. Su historia está ligada a la inmigración irlandesa: cuando comenzó a construirse, el arzobispo Hughes lo llamó «la catedral del pueblo irlandés» — en aquel momento más de la mitad de los católicos de Nueva York habían llegado huyendo de la Gran Hambruna irlandesa de 1845-52. Cuando se terminó, los neoyorquinos la llamaban «la locura de Dougherty» porque estaba en las afueras — hoy está rodeada de rascacielos en plena 5th Ave. El contraste entre sus agujas blancas de mármol de Vermont y el cristal y acero circundante es uno de los mejores encuadres fotográficos de Midtown. Interior con 10 altares y vitrales espectaculares encargados a artistas de Francia y Alemania. Entrada gratuita.",
+        badge: "Gratis" },
+      { n: "MoMA – Museum of Modern Art", lat: 40.7614, lng: -73.9776, icon: "🎨",
+        info: "A 7 min de la Catedral por la 5th Ave. Fundado en 1929 con apenas ocho grabados y una fotografía, el MoMA fue el primer museo del mundo dedicado exclusivamente al arte moderno — en una época en que «arte moderno» sonaba a escándalo. Hoy tiene más de 200.000 obras: la primera noche estrellada de Van Gogh, Las señoritas de Avignon de Picasso, La persistencia de la memoria de Dalí, la sopa Campbell de Warhol. Todo está bajo el mismo techo. El edificio en sí es fotogénico: la fachada de cristal sobre la 53rd St y el jardín escultórico interior con sus árboles y esculturas al aire libre son excepcionales. Entrada ~$30. Ver desde fuera es gratis.",
+        badge: "~$30 interior" },
+     ,
+      { n: "5th Avenue", lat: 40.7614, lng: -73.9762, icon: "🛍",
+        info: "Es una de las principales arterias del centro de Manhattan. Repleta de apartamentos de lujo y de mansiones históricas, la Quinta Avenida es un símbolo de la bonanza económica de Nueva York. Este tramo entre la 49th y la 60th Street alinea las tiendas más exclusivas del mundo — Tiffany & Co., Bergdorf Goodman, Cartier, Gucci — junto a la Catedral de San Patricio y el Rockefeller Center. Caminar por aquí es caminar por el escaparate más famoso del mundo.",
+        badge: null,
+        nearby: [{"n": "Tiffany & Co. Flagship", "type": "💍 Joyería icónica", "note": "727 5th Ave. La tienda original de Tiffany, renovada en 2023. El azul Tiffany más famoso del mundo."}, {"n": "Bergdorf Goodman", "type": "🛍 Grandes almacenes de lujo", "note": "754 5th Ave. Los grandes almacenes más elegantes de NYC. Los escaparates navideños son legendarios."}]
+      },
+ { n: "Louis Vuitton Trunk", lat: 40.7614, lng: -73.9776, icon: "👜",
+        info: "En la esquina de la 57th St y la 5th Ave, el edificio de Louis Vuitton está diseñado como un baúl de viaje gigante apilado — un guiño directo a los orígenes de la marca en 1854, cuando Louis Vuitton era un joven artesano maleteero que revolucionó el equipaje inventando el maletero plano (antes todos eran curvos, para que escurriera el agua en los carruajes descubiertos). El diseño del edificio fue encargado específicamente para hacer visible esa historia en el skyline de Midtown. Solo exterior, pero la fachada es una de las más ingeniosas de la zona.",
+        badge: null },
+      { n: "Trump Tower", lat: 40.7624, lng: -73.9738, icon: "🏗",
+        info: "En la 5th Ave entre la 56th y la 57th St. La torre de 58 pisos construida en 1983 es la residencia privada de Donald Trump — el penthouse ocupa los tres últimos pisos. El atrio interior de mármol rosa y dorado con cascada fue considerado en los 80 el epítome del lujo ostentoso. Arquitectónicamente, fue pionera en Nueva York en el concepto de uso mixto: comercio, oficinas y viviendas de lujo en el mismo edificio. La tienda Apple de la 5th Ave (el cubo de cristal) está a dos minutos. Se puede entrar al atrio libremente.",
+        badge: null },
+      { n: "Grand Central Terminal", lat: 40.7534, lng: -73.9768, icon: "🚂",
+        info: "Una de las estaciones más bellas del mundo, inaugurada en 1913. El Gran Salón tiene el techo verde turquesa pintado con constelaciones del zodiaco — están pintadas al revés, siguiendo la perspectiva medieval de «la vista de Dios desde el cielo». Durante décadas estuvo tan oscuro de hollín que nadie sabía de qué color era hasta que lo restauraron en los años 90. La luz natural que se filtra por las ventanas crea los haces dorados que salen en decenas de películas. En los años 60 hubo una lucha épica para salvar el edificio de la demolición — Jackie Kennedy Onassis fue la figura clave de la campaña que lo preservó. La Pennsylvania Station al lado fue demolida en 1963, un trauma tal para la ciudad que dio lugar a la Ley de Preservación de Monumentos de NY. Whispering Gallery en la planta inferior: los arcos del arquitecto valenciano Guastavino transmiten el sonido de esquina a esquina con pasmosa claridad.",
+        badge: "Gratis",
+        nearby: [{"n": "Grand Central Oyster Bar", "type": "🦪 Mariscos", "note": "Planta inferior de Grand Central. Desde 1913. Más de 30 variedades de ostras. Happy hour L-Mi 16:30-19:00."}, {"n": "Grand Brasserie (Vanderbilt Hall)", "type": "🥐 Brasserie francesa", "note": "Dentro de Grand Central, bajo techos de 24m. Cocina francesa de 7:00 a 02:00."}, {"n": "Little Collins", "type": "☕ Café", "note": "667 Lexington Ave. Café australiano con el mejor desayuno de Midtown East."}]
+      },
+      { n: "Edificio Chrysler", lat: 40.7516, lng: -73.9755, icon: "🔮",
+        info: "El Chrysler fue el más alto del mundo durante exactamente 11 meses (1930-1931), hasta que el Empire State lo superó. Pero la historia de su construcción es la de una carrera secreta: el arquitecto William Van Alen ocultó los últimos 38 metros de la aguja dentro del edificio y los ensambló en 90 minutos en noviembre de 1929 para superar por sorpresa al Bank of Manhattan que competía con él por el récord de altura — su arquitecto rival, Craig Severance, había construido una antena de última hora para ganar. Las famosas gárgolas en forma de águilas de Chrysler y los ornamentos de automóviles en el nivel 61 son Art Déco puro. El acero inoxidable de la cúspide — uno de los primeros usos arquitectónicos de ese material — sigue brillando igual que en 1930. Muchos arquitectos lo consideran el edificio más bello de Nueva York.",
+        badge: null },
+      { n: "Daily News Building", lat: 40.7508, lng: -73.9751, icon: "🗞",
+        info: "En el 220 E 42nd St, a 2 min andando del Chrysler. El antiguo edificio del periódico Daily News (1930), Art Déco de rayas verticales blancas y negras. El vestíbulo es de acceso libre y guarda uno de los secretos mejor guardados de Midtown: un enorme globo terráqueo de 1,2 metros de diámetro girando lentamente en el suelo, rodeado de mármol negro con marcas de brújula, zonas horarias y datos astronómicos. En la inauguración del edificio, en 1929, Orson Welles transmitió desde aquí la lectura de noticias en directo. Es el Planeta Diario de las películas de Superman — las escenas de la redacción de Clark Kent se rodaron aquí, y los productores eligieron este lobby exactamente por ese globo. Merece cinco minutos de desvío solo para entrar.",
+        badge: "Gratis · Solo lobby",
+        nearby: [{"n": "Osteria Laguna", "type": "🇮🇹 Italiano", "note": "209 E 42nd St. A pasos del edificio. Italiana norteña en ambiente relajado, buena pasta y risotto."}]
+      },
+      { n: "Bryant Park", lat: 40.7533, lng: -73.9823, icon: "🌳",
+        info: "A 5 min de Grand Central. Bajo este parque está el depósito de agua que abastecía a Manhattan en el siglo XIX — el parque fue construido sobre él. En los años 80 era uno de los puntos de venta de droga más activos de la ciudad; la transformación que lo convirtió en el oasis de bistrós y sillas que ves hoy es considerada un hito del urbanismo. En invierno tiene la pista de hielo gratuita más popular de NY. En verano, cine al aire libre los lunes por la noche (gratis). Las dos estatuas de la entrada representan a Industria y Comercio — fueron rescatadas de la fachada del Crystal Palace, el primer gran pabellón de exposiciones de Nueva York (1853), que ardió hasta los cimientos cuatro años después.",
+        badge: "Gratis",
+        nearby: [{"n": "Culture Espresso", "type": "☕ Café specialty", "note": "72 W 38th St. El mejor cortado de Bryant Park según los locales. Sin wifi."}, {"n": "Alidoro (Bryant Park)", "type": "🥖 Sándwiches italianos", "note": "W 40th St. La mejor sandwichería italiana de Midtown. El de cheesesteak con ajo negro y trufa es absurdamente bueno."}, {"n": "Bryant Park Grill", "type": "🌿 Terraza americana", "note": "25 W 40th St. Restaurante con terraza con vistas directas al parque. Brunch de fin de semana excelente."}]
+      },
+      { n: "Biblioteca Pública de Nueva York", lat: 40.7530, lng: -73.9826, icon: "📚",
+        info: "Edificio Beaux-Arts de 1911 construido sobre los depósitos de agua del siglo XIX — puedes ver las rejillas en la acera alrededor del edificio. Los dos leones de mármol de la entrada — traídos desde Tennessee — se llaman Paciencia y Fortaleza, nombres que les puso el alcalde durante la Gran Depresión para recordar a los neoyorquinos lo que necesitaban para sobrevivir a la crisis. La Rose Main Reading Room mide 90 metros de largo con techos a 15 metros: es una de las salas más bellas de América. Ha aparecido en Los Cazafantasmas, El Día de Mañana y Desayuno con Diamantes — en esa película, Audrey Hepburn miraba su collar de Tiffany frente a esta fachada. Dato mágico: la sala infantil guarda los peluches originales que inspiraron a A.A. Milne para crear Winnie the Pooh — siguen en sus vitrinas desde 1987. Horario: L/J/V/S 10-18h, Ma/Mi 10-20h, D 13-17h. Visitas guiadas gratuitas L-S 11:00 y 14:00.",
+        badge: "Gratis",
+        nearby: [{"n": "La Colombe Coffee (Bryant Park)", "type": "☕ Café de especialidad", "note": "1045 6th Ave. Granos de todo el mundo, tostados y preparados artesanalmente."}, {"n": "Whole Foods Market", "type": "🛒 Comida para llevar", "note": "Al lado de la biblioteca. Comida preparada excelente — ensaladas, sushi, platos calientes."}]
+      },
+      { n: "Summit One Vanderbilt", lat: 40.7528, lng: -73.9787, icon: "🌆",
+        info: "RESERVA A LAS 16:00. El mirador más espectacular de Midtown, inaugurado en 2021 en los pisos 91-93 del One Vanderbilt — el cuarto edificio más alto de Nueva York (427m). La experiencia combina arte inmersivo y arquitectura: la instalación «Air» de dos pisos de espejo infinito amplifica el skyline en todas direcciones; los globos metálicos plateados de «Reflect» flotan sobre las vistas; y el ascensor exterior de cristal «Ascent» te saca literalmente al exterior a 300 metros de altura. El mejor ángulo del Empire State que existe — lo ves perfectamente enmarcado de suelo a techo desde el oeste. Desde el SUMMIT también se ve Grand Central directamente abajo, el WTC al sur y, los días claros, hasta el New Jersey Palisades. Entrada incluida en el precio.",
+        badge: "⚠ Reserva 16:00" },
+      { n: "Sede de la ONU", lat: 40.7495, lng: -73.9660, icon: "🌐",
+        info: "El complejo de Naciones Unidas en la orilla del East River, construido entre 1948 y 1952. El terreno fue donado por John D. Rockefeller Jr. por 8,5 millones de dólares. Lo más extraño del lugar es su estatus legal: técnicamente, cuando cruzas la entrada no estás en territorio americano — es territorio internacional bajo la jurisdicción de la ONU, con su propia seguridad y su propio correo. El Secretariat Building (el rascacielos de cristal verde de 39 pisos) fue diseñado por un comité de arquitectos que incluía a Le Corbusier, Oscar Niemeyer y Wallace Harrison — fue uno de los primeros edificios de cortina de cristal de la historia, influyendo en todo el skyline moderno de Manhattan. Tours del interior (~$26, hay que reservar). Sin tour, el exterior desde la FDR Drive ya merece la foto.",
+        badge: null },
+    ]
+  },
+
+  // ───── DÍA 2 ─────
+  {
+    id: 2, label: "Día 2", color: "#D85A30", bg: "#FAECE7", textColor: "#712B13",
+    date: "Vie 24 abril", name: "11-S · Wall St · Estatua de la Libertad", city: "NYC",
+    route: [[40.7069,-74.0034],[40.7069,-74.0089],[40.7146,-74.0042],[40.7074,-74.0094],[40.7118,-74.0118],[40.7116,-74.0133],[40.7117,-74.0087],[40.7074,-74.0113],[40.7061,-74.0089],[40.7056,-74.0134],[40.7034,-74.0167],[40.7044,-74.0107],[40.7034,-74.0117],[40.7035,-74.0170],[40.7013,-74.0133],[40.6892,-74.0445],[40.6995,-74.0398],[40.7013,-74.0133]],
+    via: "Seaport → Wall St → 11-S → Battery Park → Ferry → Liberty Island → Ellis Island",
+    places: [
+      { n: "Oculus WTC", lat: 40.7118, lng: -74.0118, icon: "🦅",
+        info: "Diseñado por el arquitecto español Santiago Calatrava, el Oculus es la estación de metro más cara de la historia de EEUU — costó 4.000 millones de dólares, tres veces el presupuesto inicial. La polémica fue enorme, pero el espacio resultante es extraordinario: 365 metros de nave blanca que imita un pájaro alzando el vuelo desde las manos de un niño — símbolo de renacimiento. Cada 11 de septiembre a las 10:28 — la hora exacta en que cayó la segunda torre — el techo se abre y un rayo de sol entra en línea recta hasta el suelo de mármol. Es uno de los gestos arquitectónicos más poéticos de la ciudad. El interior, siempre lleno de gente, genera de todas formas un silencio extraño, casi sagrado.",
+        badge: "Gratis",
+        nearby: [{"n": "Eataly NYC Downtown", "type": "🇮🇹 Mercado italiano", "note": "4 World Trade Center. Mercado-restaurante italiano de lujo. Ideal para desayuno o almuerzo entre visitas al 11-S."}]
+      },
+      { n: "Memorial del 11-S", lat: 40.7116, lng: -74.0133, icon: "🕊",
+        info: "Dos fuentes enormes en las huellas exactas de las Torres Gemelas — las cascadas más grandes de América del Norte. El agua cae por las paredes y desaparece en un vacío central cuadrado: la arquitectura convierte la ausencia en forma visible. Los 2.977 nombres grabados en bronce están organizados por afinidad: familiares juntos, compañeros de trabajo juntos. Cada año, en el cumpleaños de cada víctima, los voluntarios colocan una rosa blanca en su nombre. El Survivor Tree — un peral calcinado encontrado entre los escombros, trasplantado y hoy en flor cada primavera — es el símbolo de la resiliencia de la ciudad. En el jardín del memorial también hay una escultura con historia: «The Sphere», una bola de bronce de Fritz Koenig que estaba en la plaza de las Torres Gemelas desde 1971 como símbolo de la paz mundial. Sobrevivió al derrumbe dañada pero intacta, fue trasladada a Battery Park y en 2017 devuelta al memorial. Sus abolladuras y desgarros son las marcas del 11-S. El Museo ($26) incluye la última viga recuperada y el Muro Fundacional original de 1960.",
+        badge: "Museo $26" },
+      { n: "One World Observatory", lat: 40.7130, lng: -74.0133, icon: "🌐",
+        info: "El mirador de la Torre de la Libertad, el edificio más alto del hemisferio occidental con sus 541 metros — exactamente 1.776 pies, la fecha de la Declaración de Independencia, elegida deliberadamente. La torre fue diseñada para ser indestructible: su núcleo de hormigón armado de 30 metros de diámetro puede soportar una explosión. El ascensor transparente «Sky Pod» hace el recorrido en 47 segundos proyectando la evolución de Manhattan desde 1609 hasta hoy en las paredes — pasas de bosque a ciudad colonial a metrópolis en menos de un minuto. En los pisos 100, 101 y 102 hay vistas 360°: al norte ves el Empire State y Midtown; al este Brooklyn y Queens; al sur el puerto y la Estatua de la Libertad; al oeste Nueva Jersey. Completamente diferente al Summit: aquí el peso emocional de estar sobre el solar de las Torres Gemelas es palpable. Entrada ~$44. Reservar con antelación.",
+        badge: "~$44 · Reservar",
+        nearby: [{"n": "Century 21 NYC", "type": "🛍 Outlet de diseño desde 1961", "note": "22 Cortlandt St, a 3 min. El outlet de moda de diseño más famoso de Nueva York — marcas europeas y americanas con descuentos del 40-65%. Cerró en 2020 y reabrió en 2022. Imprescindible para los que buscan marcas."}, {"n": "Eataly NYC Downtown", "type": "🇮🇹 Mercado italiano de lujo", "note": "4 World Trade Center. Mercado-restaurante italiano de lujo: pasta fresca, quesos, vinos, restaurantes. Ideal para desayuno o almuerzo entre visitas al WTC."}]
+      },
+      { n: "Capilla St. Paul", lat: 40.7117, lng: -74.0087, icon: "🕍",
+        info: "La capilla más antigua de Manhattan en pie, construida en 1766 — 25 años antes de la Constitución americana. George Washington rezó aquí el 30 de abril de 1789, el día de su inauguración como primer presidente de los Estados Unidos. El 11 de septiembre de 2001, milagrosamente intacta a apenas metros de las Torres Gemelas, se convirtió en el centro de operaciones de rescate: los bancos de madera del siglo XVIII sirvieron como camas para bomberos y rescatistas durante 9 meses ininterrumpidos. Los guantes, cascos y mensajes que dejaron aquellos trabajadores aún se conservan en la capilla como parte de un memorial permanente. Entrada gratuita.",
+        badge: "Gratis" },
+      { n: "Federal Reserve Bank of New York", lat: 40.7074, lng: -74.0094, icon: "🏦",
+        info: "Construido en 1924 en estilo neo-renacentista florentino, este edificio contiene en sus sótanos — excavados 18 metros bajo tierra en la roca sólida de Manhattan, por debajo incluso del nivel del mar — la mayor reserva de oro del planeta. Más de 6.000 toneladas de lingotes pertenecientes a 36 países distintos, entre ellos España, Francia, Alemania y docenas de bancos centrales. El oro no es propiedad americana: Estados Unidos simplemente lo custodia. Cuando un país transfiere oro a otro, los trabajadores del banco literalmente mueven lingotes de una habitación a otra del mismo sótano — sin que el oro salga nunca del edificio. Tours gratuitos con reserva previa (recreation.gov) donde puedes bajar a ver los lingotes en persona. Sin reserva, la imponente reja de hierro forjado de la entrada ya vale la foto.",
+        badge: "Tour gratis · Reservar",
+        nearby: [{"n": "Fulton Center", "type": "🏗 Hub de transporte + comercio", "note": "Fulton St, a 2 min andando. La estación de metro más moderna de NYC con una cúpula de cristal y acero de 53 metros — arquitectura espectacular. Dentro hay tiendas y cafés."}, {"n": "FDNY Engine Co. 10 / Ladder Co. 10", "type": "🚒 Cuartel de bomberos del 11-S", "note": "124 Liberty St, frente al Memorial. El cuartel más cercano a las Torres Gemelas — 6 de sus bomberos murieron el 11-S. En la pared exterior hay un relieve de bronce de 30 metros que narra el derrumbe. Se puede visitar el exterior."}, {"n": "Brookfield Place", "type": "🛍 Centro comercial de lujo", "note": "230 Vesey St, a 8 min. Centro comercial de lujo junto al Hudson con Saks Fifth Avenue, Hermès, Gucci y restaurantes con vistas al río. El atrio de palmeras es fotogénico."}]
+      },
+      { n: "Trinity Church", lat: 40.7074, lng: -74.0113, icon: "⛪",
+        info: "Iglesia episcopal neogótica de 1846, la tercera construida en este mismo emplazamiento desde 1697 — la primera fue destruida por los británicos durante la ocupación de Manhattan en la Guerra de Independencia. Durante 40 años fue el edificio más alto de Manhattan, y su torre era la referencia que usaban los marineros para entrar al puerto de Nueva York. En su cementerio, a pocos metros de Wall Street, está enterrado Alexander Hamilton — el primer Secretario del Tesoro y fundador del sistema bancario americano, asesinado en duelo por el Vicepresidente Aaron Burr en 1804. Hay algo deliberadamente poético en que la tumba del arquitecto del capitalismo americano esté a metros de la bolsa más importante del mundo. Gratuita.",
+        badge: "Gratis" },
+      { n: "Federal Hall", lat: 40.7069, lng: -74.0089, icon: "🏛",
+        info: "En este lugar exacto, el 30 de abril de 1789, George Washington juró el cargo como primer presidente de los Estados Unidos ante una multitud que llenaba Wall Street. El edificio original era el primer ayuntamiento de Nueva York y la primera sede del gobierno federal americano — aquí se redactó la Declaración de Derechos (Bill of Rights). Ese edificio fue demolido. El que ves hoy (1842) es posterior, construido como aduana en estilo neoclásico con columnas dóricas de mármol. La estatua de Washington en la entrada señala el punto exacto donde prestó juramento — el mismo sitio donde, 212 años después, el humo y el polvo del 11-S lo cubrieron de ceniza. Hoy es monumento nacional gestionado por el National Park Service. Gratuito.",
+        badge: "Gratis",
+        nearby: [{"n": "Stone Street", "type": "🍺 Terrazas históricas", "note": "A 2 min andando. La calle más antigua del Distrito Financiero (1600s), hoy peatonal y llena de terrazas."}]
+      },
+      { n: "Wall Street + NYSE + Fearless Girl", lat: 40.7061, lng: -74.0089, icon: "🏛",
+        info: "Wall Street toma su nombre de un muro real de madera y tierra — «de Waal» en holandés — que los colonos de Nueva Ámsterdam construyeron en 1653 para defenderse de los ingleses. Irónicamente, los ingleses tomaron la ciudad once años después sin ningún problema. Las calles torcidas e irregulares de esta zona son el único vestigio visible del plano de la ciudad colonial. El NYSE (solo exterior) es la bolsa más grande del mundo por capitalización; la bandera americana en su fachada necesita a varias personas para desplegarla. Frente a la entrada está The Fearless Girl: instalada el 7 de marzo de 2017, víspera del Día Internacional de la Mujer, por una gestora de fondos para reivindicar más mujeres en los consejos de dirección. El NYSE intentó que la quitaran; la ciudad decidió que se quedara.",
+        badge: null,
+        nearby: [{"n": "Stone Street", "type": "🍺 Ambiente exterior", "note": "A 3 min andando. La calle más antigua del Distrito Financiero (1600s), hoy peatonal y llena de terrazas."}, {"n": "Fraunces Tavern", "type": "🍺 Taberna histórica", "note": "54 Pearl St. Taverna de 1762 donde George Washington se despidió de sus oficiales en 1783."}]
+      },
+      { n: "Bowling Green + National Museum of the American Indian", lat: 40.7032, lng: -74.0135, icon: "🌿",
+        info: "El parque público más antiguo de Nueva York (1733), construido sobre el punto donde, en 1626, el director de Nueva Ámsterdam Peter Minuit compró la isla de Manhattan a los indios Lenape por «el valor de 60 guilders» en cuentas de wampum — una de las transacciones más citadas (y más mal interpretadas) de la historia. En 1776, después de que Washington leyera la Declaración de Independencia, una multitud enfervorizada arrancó la estatua del rey Jorge III que presidía el parque y la fundió para hacer 42.000 balas de mosquete. La verja original de hierro forjado, con coronas reales en los postes, sigue siendo la misma de 1771 — las únicas coronas que los revolucionarios no pudieron arrancar. El edificio Alexander Hamilton Custom House de enfrente (1907), con sus figuras alegóricas de los continentes en la fachada, alberga el Museo Nacional del Indio Americano. Gratuito y extraordinario.",
+        badge: "Gratis" },
+      { n: "Charging Bull", lat: 40.7056, lng: -74.0134, icon: "🐂",
+        info: "En la madrugada del 15 de diciembre de 1989, el escultor siciliano Arturo Di Modica llegó con una grúa, colocó este toro de 3.200 kg frente al NYSE sin ningún permiso y se marchó. La policía lo retiró horas después. Pero los medios cubrieron la historia con tanto entusiasmo que la ciudad se vio obligada a reinstalarlo definitivamente en su ubicación actual. Di Modica lo concibió como regalo a los neoyorquinos tras el crash bursátil de 1987 — «para demostrar que el pueblo americano puede salir adelante de cualquier crisis». Costó 360.000 dólares de su propio bolsillo. El toro se convirtió en uno de los símbolos más fotografiados de Nueva York sin haber pedido permiso a nadie — algo perfectamente neoyorquino.",
+        badge: null,
+        nearby: [{"n": "Liberty Bagels", "type": "🥯 Bagels", "note": "Junto al Charging Bull. Los bagels más recomendados de la zona."}]
+      },
+      { n: "Stone Street", lat: 40.7044, lng: -74.0107, icon: "🪨",
+        info: "La calle más antigua de Manhattan con adoquines originales, a dos minutos del Charging Bull. En el siglo XVII se llamaba Hoogh Straet (Calle Alta) en holandés, y fue la primera calle pavimentada de Nueva Ámsterdam — los adoquines se pusieron en 1658 para no hundirse en el barro. En 1835 un incendio devastador arrasó casi todo el Distrito Financiero; las casas de ladrillo que ves hoy son la reconstrucción inmediatamente posterior, de 1836-1840. Hoy la calle es completamente peatonal y sus aceras están llenas de terrazas de bares y restaurantes que llenan la calzada histórica de mesas. Es el lugar favorito de los trabajadores de Wall Street para tomar cerveza al atardecer. Un rincón que casi ningún turista encuentra.",
+        badge: "Calle más antigua · Gratis",
+        nearby: [{"n": "Fraunces Tavern", "type": "🍺 Taberna 1719", "note": "54 Pearl St, a 3 min. La taberna de Washington, sigue siendo bar y restaurante."}]
+      },
+      { n: "Fraunces Tavern", lat: 40.7034, lng: -74.0117, icon: "🍺",
+        info: "El edificio más antiguo de Manhattan en uso continuo, construido en 1719 como residencia privada del comerciante Stephen DeLancey. En 1762, Samuel Fraunces — un hombre libre de origen caribeño y africano — lo convirtió en la taberna «Queen's Head», que se convirtió en punto de reunión de los Sons of Liberty durante los años previos a la Revolución. El 4 de diciembre de 1783, nueve días después de que los últimos soldados británicos abandonaran Nueva York, George Washington reunió aquí a sus oficiales para despedirse. Los testigos lo describieron «bañado en lágrimas» mientras decía: 'Con el corazón lleno de amor y gratitud me despido ahora de vosotros'. Después les dio la mano uno a uno en silencio y se marchó caminando hacia el ferry. Entre 1785 y 1788, mientras Nueva York fue la capital del nuevo país, el edificio albergó los Departamentos de Guerra, Exteriores y Hacienda del Gobierno federal. El restaurante en la planta baja sigue operativo. El museo en los pisos superiores guarda un mechón de pelo de Washington.",
+        badge: "Museo $7 · Bar activo",
+        nearby: [{"n": "Stone Street", "type": "🪨 Calle histórica siglo XVII", "note": "A 3 min. La calle adoquinada más antigua de Manhattan, llena de terrazas."}]
+      },
+      { n: "Staten Island Ferry", lat: 40.7013, lng: -74.0133, icon: "⛴",
+        info: "Ferry gratuito — uno de los mejores regalos que hace Nueva York a sus visitantes. Sale cada 15-20 min entre semana (30 min fines de semana) desde el Whitehall Terminal, trayecto de 25 minutos. El consejo de Eric, que circula por internet desde hace años: cuando subas, NO camines a la proa. Ve a la POPA y sube por las primeras escaleras. Desde el extremo trasero de la cubierta superior tendrás vistas simultáneas de Manhattan retrocediendo y la Estatua de la Libertad acercándose — la combinación perfecta. En invierno las puertas de proa están cerradas en el viaje de ida, así que solo tienes una oportunidad: aprovecha el de ida. El ferry lo opera la ciudad de Nueva York desde 1905 y transporta 70.000 personas al día. Los barcos naranja de doble proa son inconfundibles.",
+        badge: "Gratis ⭐" },
+      { n: "Estatua de la Libertad", lat: 40.6892, lng: -74.0445, icon: "🗽",
+        info: "El símbolo más reconocible de Nueva York, con una historia de origen menos conocida. La idea no fue de un gobierno sino de un historiador francés, Édouard de Laboulaye, que la propuso en una cena privada en 1865 como regalo de la democracia francesa a la americana. La recaudación tardó 20 años: los franceses pagaron la estatua, los americanos el pedestal. El pedestal se financió con una campaña de donaciones populares liderada por Joseph Pulitzer desde su periódico, que recaudó 100.000 dólares en pequeñas aportaciones. La estructura interior de hierro es de Gustave Eiffel — el mismo que construiría su torre en París tres años después. Las 7 puntas de la corona representan los 7 mares y los 7 continentes. Las cadenas rotas a sus pies, símbolo de la abolición de la esclavería, solo se ven bien desde el aire. Para pisar la isla: ferry oficial desde Battery Park (~$24).",
+        badge: "Ferry oficial ~$24" },
+      { n: "Ellis Island", lat: 40.6995, lng: -74.0398, icon: "🏛",
+        info: "La puerta de entrada a América para más de 12 millones de inmigrantes entre 1892 y 1954. En sus mejores años procesaba hasta 5.000 personas al día — médicos examinando ojos con un gancho de botones en busca de tracoma, inspectores marcando con tiza la ropa de los sospechosos de enfermedad, intérpretes en 30 idiomas intentando entender nombres que nunca habían oído. Muchos apellidos americanos quedaron simplificados o directamente cambiados aquí. El Grand Hall (la sala de registro) fue restaurado en los años 90 y es uno de los espacios más emotivos de Nueva York: las maletas, los documentos, las fotos de familias que apostaron todo cruzando el Atlántico. El 40% de los americanos tiene un antepasado que pasó por esta sala. El ferry para Ellis Island sale de Battery Park, mismo barco que va a la Estatua de la Libertad.",
+        badge: "Incluido en ferry" },
+   
+      { n: "Castle Clinton", lat: 40.7034, lng: -74.0167, icon: "🏰",
+        info: "El fuerte circular de arenisca roja que preside Battery Park fue construido en 1811 para defender Manhattan de los ingleses — que nunca atacaron. A lo largo del siglo XIX tuvo más vidas que ningún otro edificio de la ciudad: fue sala de conciertos donde Jenny Lind, la «Ruiseñor Sueca», cantó ante 6.000 personas en 1850; luego fue el primer acuario público de América; y entre 1855 y 1890, antes de que existiera Ellis Island, fue el Centro de Inmigración por el que pasaron 8 millones de personas — más del doble que por Ellis Island. Cada uno de esos inmigrantes pisó exactamente este suelo. Hoy es el punto de venta de tickets del ferry oficial a la Estatua de la Libertad. Monumento Nacional, gratuito.",
+        badge: "Gratis · Monumento Nacional",
+        nearby: [{"n": "Staten Island Ferry Terminal", "type": "⛴ Ferry gratuito", "note": "A 5 min. El mejor modo de ver la Estatua de la Libertad sin pagar."}]
+      },
+      { n: "Battery Park", lat: 40.7035, lng: -74.0170, icon: "🌿",
+        info: "El extremo sur de Manhattan, donde la isla termina y comienza el puerto. Este trozo de tierra no existía en el siglo XVII — es tierra ganada al mar con los escombros y rellenos de 300 años de construcción. Castle Clinton está en la entrada. Pero el parque está lleno de monumentos que casi nadie busca: el East Coast Memorial, ocho bloques de granito con los nombres de los 4.601 soldados americanos muertos en el Atlántico durante la Segunda Guerra Mundial, con un águila mirando hacia Europa; el American Merchant Mariners Memorial (1991), una escultura de bronce de tres marineros — uno cayendo al agua, otro tendiendo la mano — que recuerda a los 6.700 marinos mercantes muertos en la guerra, con la particularidad de que según sube la marea el marinero del agua va quedando más sumergido; el Korean War Veterans Memorial, una placa de granito negro con los nombres de los neoyorquinos muertos en Corea (1950-1953); y el Monumento a Emma Lazarus con su famoso poema «Los nuevos colosos», cuyas últimas líneas dan la bienvenida a los inmigrantes que llegan al puerto. Castle Clinton, el fuerte circular de arenisca roja, fue sala de conciertos, acuario y el primer Centro de Inmigración de América — por él pasaron 8 millones de personas antes de que existiera Ellis Island.",
+        badge: "Gratis",
+        nearby: [{"n": "Pier A Harbor House", "type": "🍺 Bar con vistas", "note": "22 Battery Place. Bar en edificio histórico de 1886 a orillas del agua. Cerveza artesanal con vistas al puerto."}]
+      }, ]
+  },
+
+  // ───── DÍA 3 ─────
+  {
+    id: 3, label: "Día 3", color: "#7F77DD", bg: "#EEEDFE", textColor: "#3C3489",
+    date: "Sáb 25 abril", name: "Brooklyn · Chinatown · SoHo", city: "NYC",
+    route: [[40.7127,-74.0059],[40.7121,-74.0083],[40.7146,-74.0042],[40.7069,-74.0034],[40.7061,-73.9969],[40.7032,-73.9896],[40.7045,-73.9924],[40.7028,-73.9856],[40.6971,-73.9962],[40.6989,-73.9930],[40.7159,-73.9952],[40.7143,-73.9981],[40.7155,-73.9971],[40.7246,-73.9973],[40.7224,-73.9968],[40.7233,-74.0030],[40.7243,-74.0018],[40.7223,-73.9873]],
+    via: "City Hall → Brooklyn Bridge → DUMBO → Heights Promenade → Manhattan Bridge → Canal St → Little Italy → SoHo",
+    // segments: travel time between each consecutive route point [walk_min, transit_min, mode_hint]
+    segments: [
+      { from: "City Hall", to: "Puente de Brooklyn", walk: 3, transit: null, note: "3 min andando — la entrada peatonal está justo enfrente" },
+      { from: "Puente de Brooklyn", to: "DUMBO", walk: 35, transit: null, note: "~30 min cruzando el puente a pie" },
+      { from: "DUMBO", to: "Jane's Carousel", walk: 5, transit: null, note: "5 min andando por el paseo del East River" },
+      { from: "Jane's Carousel", to: "Vinegar Hill", walk: 8, transit: null, note: "8 min andando por Front St" },
+      { from: "Vinegar Hill", to: "Plymouth Church", walk: 10, transit: null, note: "10 min andando" },
+      { from: "Brooklyn (Manhattan Bridge)", to: "Chinatown", walk: 12, transit: 5, note: "12 min andando por el puente de Manhattan, o 5 min en metro línea J/Z" },
+      { from: "Chinatown", to: "Little Italy", walk: 5, transit: null, note: "5 min andando por Canal St" },
+      { from: "Little Italy", to: "Washington Square Park", walk: 10, transit: null, note: "10 min andando por Broadway" },
+    ],
+    places: [
+      { n: "City Hall (Ayuntamiento de NY)", lat: 40.7127, lng: -74.0059, icon: "🏛",
+        info: "El Ayuntamiento de Nueva York (1812) es uno de los edificios públicos más antiguos de la ciudad en uso continuo. Tiene un secreto arquitectónico: su fachada norte, la que da a la ciudad, fue terminada en mármol lujoso; la fachada sur se construyó en piedra caliza barata porque en 1812 nadie imaginaba que Manhattan crecería hacia el norte — se pensaba que los ciudadanos siempre vendrían desde el sur. Desde este edificio se han anunciado todas las grandes victorias y tragedias de la ciudad. El City Hall Park fue el lugar donde Washington leyó la Declaración de Independencia a sus tropas en 1776. Está justo frente a la entrada peatonal al Puente de Brooklyn.",
+        badge: "Gratis" },
+      { n: "Woolworth Building", lat: 40.7121, lng: -74.0083, icon: "🏛",
+        info: "El edificio más alto del mundo durante 17 años (1913-1930), pagado en efectivo — sin hipoteca, sin prestamistas — por Frank Woolworth, el rey de las tiendas de cinco centavos. Costó 13,5 millones de dólares, que Woolworth reunió níquel a níquel desde su primer comercio en Lancaster, Pennsylvania, en 1879. El estilo neogótico de 60 pisos fue apodado «la Catedral del Comercio» el día de su inauguración, cuando el presidente Woodrow Wilson pulsó un botón desde la Casa Blanca y 80.000 bombillas iluminaron la fachada — con Thomas Edison supervisando la operación. El lobby tiene techos abovedados cubiertos de mosaicos dorados y figuras de Tiffany; en las vigas hay caricaturas del propio Woolworth contando monedas y del arquitecto Cass Gilbert sosteniendo una maqueta del edificio. Para llegar a este lobby hay que reservar tour (~$20-30) porque el acceso libre desapareció en 2002. Desde fuera: la aguja de cobre verde peeking entre los rascacielos modernos es una de las mejores vistas del skyline de Lower Manhattan.",
+        badge: "Tour lobby ~$20",
+        nearby: [{"n": "City Hall Park", "type": "🌳 Parque histórico", "note": "A 2 min. El parque más antiguo de Manhattan en uso continuo, justo frente a la entrada del Puente de Brooklyn."}]
+      },
+      { n: "African Burial Ground National Monument", lat: 40.7146, lng: -74.0042, icon: "🪦",
+        info: "En 1991, durante la excavación de un edificio federal en 290 Broadway, los obreros encontraron restos humanos a 9 metros de profundidad. Pararon las obras. Lo que apareció fue el cementerio de esclavos más grande jamás encontrado en América del Norte: más de 15.000 africanos enterrados entre 1630 y 1795 en lo que era entonces el extrarradio de Nueva Ámsterdam, fuera de los límites de la ciudad porque la Iglesia de Trinidad les prohibía ser enterrados en suelo sagrado. Casi la mitad de los 419 esqueletos recuperados eran niños menores de 12 años — reflejo de la mortalidad brutal de la esclavitud urbana. Los restos mostraban señales inequívocas de trabajo físico extremo: literalmente murieron construyendo la ciudad. El descubrimiento hizo estallar la idea de que Nueva York era ajena a la esclavitud: en el siglo XVIII, el 20% de la población de Manhattan era esclava. El monumento fue designado por Bush en 2006. El mapa en el suelo del memorial muestra África en el centro, con rayos que apuntan hacia América, el Caribe y Europa — los vectores de la diáspora forzada. Centro de visitantes gratuito en el edificio federal.",
+        badge: "Gratis · Monumento Nacional",
+        nearby: [{"n": "Fraunces Tavern", "type": "🍺 Taberna histórica 1762", "note": "54 Pearl St. A 8 min andando. Donde Washington se despidió de sus oficiales en 1783. Sigue siendo bar y restaurante."}]
+      },
+      { n: "South Street Seaport + Pier 17", lat: 40.7069, lng: -74.0034, icon: "⛵",
+        info: "El barrio marítimo más antiguo de Manhattan, en uso como puerto desde el siglo XVII. Las calles adoquinadas del Fulton Market conservan edificios de ladrillo del siglo XIX donde los comerciantes vendían especias, tabaco y ron que llegaban de todo el mundo. En el siglo XIX, South Street era la arteria más activa del comercio mundial; aquí atracaban los clippers que unían Nueva York con China en tiempo récord. Los muelles siguen siendo el corazón del barrio: el Pier 15 es la terraza al aire libre más accesible — una plataforma de dos niveles sobre el East River con vistas directas al Puente de Brooklyn, gratuita y abierta todo el año. El Pier 16 tiene amarrados varios barcos históricos del South Street Seaport Museum, incluido el velero Wavertree de 1885 y el barco faro Ambrose — se pueden visitar. El Pier 17 es el edificio nuevo sobre el agua: una plataforma con tiendas, restaurantes y una terraza rooftop gratuita desde la que se ve el Puente de Brooklyn de frente, a la misma altura — una de las mejores vistas de la ciudad sin colas ni entrada. En el nivel inferior, frente al Pier 16, está el punto exacto donde atracaban los grandes clipper ships del siglo XIX.",
+        badge: "Terraza gratis",
+        nearby: [{"n": "The Fulton (Tom Colicchio)", "type": "🦞 Mariscos premium", "note": "89 South St, Pier 17. Del chef Tom Colicchio. Mariscos y cocina americana en el edificio del Seaport. Para una ocasión especial."}, {"n": "Pier 17 Food Vendors", "type": "🍔 Casual al aire libre", "note": "Varios puestos en el Pier 17 con vistas al puente. Ambiente relajado sobre el agua."}]
+      },
+      { n: "Puente de Brooklyn", lat: 40.7061, lng: -73.9969, icon: "🌉",
+        info: "Inaugurado en 1883, fue el primer gran puente colgante de acero del mundo. John Roebling, su diseñador, murió en un accidente de obra antes de que empezara la construcción. Su hijo Washington tomó el mando y contrajo la enfermedad de descompresión trabajando bajo el río — quedó paralítico y postrado en cama. Durante seis años dirigió la obra desde la ventana de su apartamento en Brooklyn usando binoculares, mientras su esposa Emily transmitía sus instrucciones a los ingenieros. Emily Roebling fue la primera persona en cruzar el puente terminado, en 1883. Dos semanas después de la inauguración, un rumor de que el puente se hundía desató una estampida que mató a 12 personas — para demostrar su solidez, los ingenieros hicieron desfilar 21 elefantes de circo por él. Cruzarlo a pie tarda ~30 min.",
+        badge: null },
+      { n: "DUMBO — foto icónica", lat: 40.7032, lng: -73.9896, icon: "📸",
+        info: "DUMBO: Down Under the Manhattan Bridge Overpass. Décadas de zona industrial; hoy uno de los barrios más cotizados de Brooklyn. La foto icónica — el arco del Puente de Manhattan enmarcado entre edificios de ladrillo rojo — está en la esquina de Water St y Washington St (Google Maps: «39-21 Washington St»). Ponerse en el centro de la calle y mirar hacia el puente. A pocos pasos está la Pebble Beach del Main Street Park — una pequeña playa de guijarros ideal para descansar con vistas al skyline. Junto a ella, el Empire Fulton Ferry Park ofrece otro ángulo espectacular del Puente de Brooklyn. Calles principales: Water St, Main St, Front St y Washington St.",
+        badge: null,
+        nearby: [{"n": "Juliana's Pizza", "type": "🍕 Pizza napolitana", "note": "19 Old Fulton St. La mejor pizza de DUMBO — debajo mismo del puente. Solo efectivo."}, {"n": "Brooklyn Ice Cream Factory", "type": "🍦 Helados artesanos", "note": "14 Old Fulton St. Helados artesanos en la antigua caseta de barcos. Vistas al skyline de Manhattan."}, {"n": "Cecconi's DUMBO", "type": "🍷 Italiano con vistas", "note": "55 Water St. Italiano de lujo con terraza y vistas panorámicas al puente de Brooklyn."}, {"n": "Time Out Market (Planta 5)", "type": "🏙 Terraza con vistas", "note": "55 Water St. La terraza del 5to piso es gratuita y tiene vistas espectaculares. Dentro hay opciones de todo tipo."}]
+      },
+      { n: "Jane's Carousel + Time Out Market", lat: 40.7045, lng: -73.9924, icon: "🎠",
+        info: "Jane's Carousel es un tiovivo de 1922 completamente restaurado, instalado en un pabellón de cristal diseñado por el arquitecto Jean Nouvel (el mismo del Museo Quai Branly de París) junto al East River. Solo $2 montar. La restauración la llevó a cabo durante 30 años Jane Walentas, quien compró el tiovivo abandonado en Ohio en 1984 — cada uno de los 48 caballos tallados a mano fue desmontado, restaurado y repintado individualmente. El pabellón de cristal se abre completamente en verano para que el tiovivo parezca flotar sobre el East River con el Puente de Brooklyn de fondo. El Time Out Market al lado es el mejor food hall de Brooklyn: los mejores chefs de la ciudad en formato mercado. En la planta 5 hay una terraza gratuita con vistas del puente — merece subir aunque no comas.",
+        badge: "$2",
+        nearby: [{"n": "Shake Shack DUMBO", "type": "🍔 Burgers", "note": "1 Old Fulton St, frente al río. Hamburguesería de culto con vistas al puente."}, {"n": "Almondine Bakery", "type": "🥐 Panadería francesa", "note": "85 Water St. La mejor panadería de DUMBO — croissants y baguettes desde antes de que el barrio fuese cool."}]
+      },
+      { n: "Barrio de Vinegar Hill", lat: 40.7028, lng: -73.9856, icon: "🏘",
+        info: "Al final de la calle Front St, pasando DUMBO. Nombre que viene de la batalla de Vinegar Hill en Irlanda (1798), en la que los irlandeses fueron derrotados por los ingleses — los inmigrantes irlandeses que se asentaron aquí en el siglo XIX bautizaron el barrio en memoria de esa derrota. Es uno de los rincones más silenciosos y desconocidos de Brooklyn: calles de adoquines, casas de ladrillo de principios del siglo XIX, sin tiendas ni turistas. La calle con más encanto es Hudson Ave. Vale la pena desviar cinco minutos antes de volver a Manhattan.",
+        badge: null,
+        nearby: [{"n": "Vinegar Hill House", "type": "🌿 Americana de temporada", "note": "72 Hudson Ave. Restaurante en casa de piedra con jardín. Cocina americana de mercado, favorita del barrio."}]
+      },
+      { n: "Brooklyn Heights Promenade", lat: 40.6971, lng: -73.9962, icon: "🌆",
+        info: "El paseo peatonal elevado más espectacular de Brooklyn: 500 metros sobre la autopista BQE con las mejores vistas del skyline del Distrito Financiero de toda la ciudad. Se construyó en los años 50 sobre una autopista que Robert Moses quería trazar por en medio del barrio — los vecinos de Brooklyn Heights negociaron construir el paseo encima como compensación, un trato que resultó ser uno de los mejores de la historia urbanística de Nueva York. El barrio que lo rodea, Brooklyn Heights, fue el primer barrio histórico protegido de toda la ciudad (1965). Sus brownstones del siglo XIX están casi intactas. Desde aquí se ven simultáneamente el Distrito Financiero, los puentes de Brooklyn y Manhattan, y en días claros la Estatua de la Libertad al fondo. A 10 min andando desde DUMBO.",
+        badge: "Vistas impresionantes",
+        nearby: [{"n": "Noodle Pudding", "type": "🍝 Italiano de barrio", "note": "38 Henry St. Italiano cash-only sin web ni rótulo, solo se sabe por boca a boca. Uno de los secretos mejor guardados de Brooklyn Heights."}]
+      },
+      { n: "Plymouth Church", lat: 40.6989, lng: -73.9930, icon: "⛪",
+        info: "Iglesia congregacionalista construida en 1847, una de las más importantes de la historia de los derechos civiles americanos. Su pastor Henry Ward Beecher — hermano de Harriet Beecher Stowe, la autora de «La Cabaña del Tío Tom» — la convirtió en un punto clave del Ferrocarril Clandestino: la red de casas seguras que ayudaba a los esclavos fugitivos del Sur a llegar al Norte. Se calcula que más de 1.000 personas esclavizadas pasaron por este edificio camino a la libertad. Beecher llegó a organizar subastas ficticias en el propio púlpito para comprar la libertad de esclavos específicos ante la congregación. En el jardín trasero hay una estatua de Abraham Lincoln y un fragmento de la cadena de un esclavizado. Hoy sigue siendo iglesia activa.",
+        badge: null },
+      { n: "Chinatown — Canal St + Mott St", lat: 40.7159, lng: -73.9952, icon: "🏮",
+        info: "Canal Street: epicentro del comercio de imitaciones (bolsos, relojes, gafas — si alguien te guiña el ojo y señala una puerta trasera, es que tienen mercancía extra dentro). Mott Street: souvenirs más baratos que en cualquier otro sitio de Manhattan. El Mahayana Buddhist Temple en Mott St tiene un buda dorado de 5 metros rodeado de flores y naranjas — se puede entrar gratis. Confucius Plaza: plaza con la estatua del filósofo Confucio, símbolo de la comunidad china de NY. La historia del barrio es la de la inmigración china en oleadas: los primeros llegaron a construir el ferrocarril transcontinental en los años 1860; los siguientes huyeron de la discriminación de California; luego vinieron los que escaparon de la guerra civil china. En 1882 el Congreso aprobó la Chinese Exclusion Act — la única ley en la historia americana que prohibía la inmigración de una sola nacionalidad. Chinatown sobrevivió y creció a pesar de todo.",
+        badge: null,
+        nearby: [{"n": "Nom Wah Tea Parlor", "type": "🫖 Dim sum histórico", "note": "13 Doyers St. El restaurante de dim sum más antiguo de NY (1920). Har gow, siu mai y char siu bao."}, {"n": "Super Taste Restaurant", "type": "🍜 Noodles chinos", "note": "26 Eldridge St. Fideos hechos a mano en caldo de cerdo. Uno de los favoritos del barrio."}]
+      },
+      { n: "Doyers Street", lat: 40.7143, lng: -73.9981, icon: "⚔",
+        info: "Una calle de apenas 60 metros con una curva pronunciada en el centro — y la historia más oscura de todo Chinatown. Doyers Street ganó el apodo de 'The Bloody Angle' (El Ángulo Sangriento) a principios del siglo XX, cuando las guerras entre bandas rivales de tongs — las organizaciones criminales chinas que controlaban el juego, el opio y la prostitución — usaban exactamente esa curva para tender emboscadas. Los rivales doblaban la esquina sin ver lo que les esperaba. La policía llegó a declarar que más hombres habían sido asesinados en esa curva que en ningún otro punto de idéntica extensión en el mundo. En 1905, la banda Hip Sing lanzó petardos al escenario del teatro chino que había aquí — el único de Nueva York — y cuatro sicarios abrieron fuego sobre 400 espectadores. Los asesinos huyeron por los túneles subterráneos que recorrían todo Chinatown, de los que hoy solo queda accesible un tramo en el número 5. Hoy la calle es apacible: barberías, restaurantes y el Nom Wah Tea Parlor (1920), el dim sum más antiguo de Nueva York. Irving Berlin tocó en la sala de reuniones del número 6 cuando era un chico pobre del East Side.",
+        badge: "Historia oscura · Gratis",
+        nearby: [{"n": "Nom Wah Tea Parlor", "type": "☕ Dim sum desde 1920", "note": "13 Doyers St. El restaurante de dim sum más antiguo de Nueva York. Dumplings, rollos de huevo y pastel de luna desde 1920."}]
+      },
+      { n: "Mahayana Buddhist Temple", lat: 40.7155, lng: -73.9971, icon: "🪷",
+        info: "El templo budista más grande de Nueva York, en el 133 Canal St, justo en la entrada de Chinatown desde el Puente de Manhattan. Una buda dorado de casi 5 metros preside el interior rodeado de flores, naranjas, incienso y ofrendas — la estatua más grande de Buda en cualquier templo chino de Nueva York. El edificio exterior, con su fachada roja y amarilla y los dragones dorados en los pilares, contrasta radicalmente con el entorno urbano. Fue fundado en 1962 por la comunidad cantonesa como lugar de culto y comunidad para los inmigrantes recién llegados que no hablaban inglés. Hoy sigue siendo templo activo — los fieles mezclan sus rezos con los turistas que entran con curiosidad. Entrada gratuita. Se puede entrar con respeto: quitarse los zapatos no es obligatorio pero sí recomendable no hacer fotos durante los rezos.",
+        badge: "Gratis · Templo activo",
+        nearby: [{"n": "Nom Wah Tea Parlor", "type": "☕ Dim sum desde 1920", "note": "13 Doyers St, a 3 min. El restaurante de dim sum más antiguo de Nueva York, en el mismísimo Doyers Street."}]
+      },
+      { n: "Little Italy — Mulberry St + Police Building", lat: 40.7246, lng: -73.9973, icon: "🇮🇹",
+        info: "Lo que fue un barrio italoamericano vibrante que en 1900 tenía 10.000 habitantes por hectárea ha quedado reducido principalmente a Mulberry Street. La historia es la de la inmigración y la gentrificación: los italianos llegaron masivamente entre 1880 y 1920 huyendo de la miseria del sur de Italia — Sicilia, Calabria, Campania. Traían consigo la cultura de las pasticcerie, las trattorias y los códigos de honor. Hoy es un barrio pequeño y muy turístico, pero pasear por Mulberry Street es curioso. Al norte de Canal St, las calles de restaurantes chinos van dejando paso a restaurantes italianos — el límite exacto entre Chinatown y Little Italy se mueve cada año a favor de Chinatown.",
+        badge: null,
+        nearby: [{"n": "Caffe Palermo", "type": "🍮 Cannoli siciliani", "note": "148 Mulberry St. Los cannoli más famosos de Little Italy. Desde 1973."}, {"n": "Rubirosa", "type": "🍕 Pizza de Little Italy", "note": "235 Mulberry St. Famosa por su masa finísima tipo New Haven. Reserva imprescindible."}]
+      },
+      { n: "Old Police Headquarters", lat: 40.7224, lng: -73.9968, icon: "🏛",
+        info: "El edificio más lujoso que la policía de Nueva York construyó jamás, y también el más incongruente con su entorno: un palacio Beaux-Arts de 1909 con una cúpula de cobre verde de 5 pisos que se eleva sobre las calles de Little Italy en el 240 Centre St. Fue el cuartel general de la policía de Nueva York durante 64 años (1909-1973). Su construcción fue deliberadamente monumental — el ayuntamiento quería demostrar que el orden y la ley tenían la misma categoría arquitectónica que los bancos y los palacios gubernamentales de la 5th Ave. El interior tenía mármol de Carrara, escaleras de caoba y una cúpula pintada al fresco. En los calabozos del sótano pasaron la noche figuras como Lucky Luciano y otros capos de la mafia que tenían sus operaciones a tres manzanas de donde estaban encerrados. En 1973 la policía se mudó a un edificio moderno y el ayuntamiento vendió el palacio. Hoy es uno de los condominios más exclusivos de Manhattan — un apartamento de 3 habitaciones cuesta más de 3 millones de dólares. La ironía de que el edificio donde se procesó a miles de inmigrantes italianos sea ahora uno de los más caros del barrio no se le escapa a nadie.",
+        badge: "Solo exterior",
+        nearby: [{"n": "Lombardi's Pizzeria", "type": "🍕 Primera pizzería de América (1905)", "note": "32 Spring St, a 3 min. La primera pizzería de los Estados Unidos, abierta en 1905 por Gennaro Lombardi, un inmigrante napolitano. Solo pizza entera, sin cortar en porciones."}]
+      },
+      { n: "Greene Street — Arquitectura Cast Iron", lat: 40.7233, lng: -74.0030, icon: "🏗",
+        info: "Greene Street entre Canal y Houston es el bloque más concentrado de arquitectura cast-iron del mundo — más de 50 edificios de hierro fundido del siglo XIX en poco más de 5 manzanas, con las calzadas aún en adoquines originales belgas. El hierro fundido fue la revolución constructiva de los años 1850-1880: más barato y rápido que la piedra, prefabricado en moldes de fundición, permitía imitar columnas corintias, arcos y ornamentos renacentistas en masa. El número 488 de Broadway esquina con Broome — el Haughwout Building (pronunciado HA-wout), construido en 1857 — es el edificio más importante de toda la zona: fue el primer edificio del mundo en instalar un ascensor de pasajeros con sistema de seguridad, diseñado por Elisha Otis en persona por 300 dólares. Sin ese ascensor, los rascacielos no habrían sido posibles — la gente no habría subido más de 5 pisos. Mary Todd Lincoln encargó aquí la vajilla oficial de la Casa Blanca. En los años 60, cuando todo esto eran fábricas abandonadas que la ciudad quería demoler para construir una autopista elevada de 10 carriles, los artistas que vivían ilegalmente en los lofts lucharon para que se convirtiera en el Distrito Histórico que ves hoy. Jane Jacobs fue la figura clave de esa batalla.",
+        badge: "Distrito Histórico Nacional",
+        nearby: [{"n": "Housing Works Bookstore", "type": "📚 Librería solidaria", "note": "126 Crosby St. Librería de segunda mano gestionada por voluntarios, con café. Todo el beneficio va a servicios para personas sin hogar y con VIH. Una de las librerías más queridas de SoHo."}]
+      },
+      { n: "SoHo", lat: 40.7243, lng: -74.0018, icon: "🏗",
+        info: "South of Houston Street — el barrio de arquitectura de hierro fundido y tiendas de diseño tiene una historia en capas fascinante. En el siglo XIX era el distrito manufacturero más activo de Manhattan: fábricas de telas, imprentas, almacenes. Los edificios de cast-iron (hierro fundido) que ves son únicos en el mundo: fachadas prefabricadas de hierro que imitaban la piedra con columnas, arcos y ornamentos — más baratas y rápidas que la piedra, y teóricamente ignífugas (aunque el hierro se derrite con el calor suficiente). En los años 60 y 70 las fábricas se fueron y los artistas se mudaron: necesitaban espacios grandes, baratos y sin vecinos que se quejaran del ruido. Robert Rauschenberg, Roy Lichtenstein, Jean-Michel Basquiat vivieron y trabajaron en estos lofts. SoHo fue el centro del arte contemporáneo mundial antes de que el éxito comercial lo convirtiera en lo que ves hoy. Broadway y Prince Street son el corazón.",
+        badge: null,
+        nearby: [{"n": "Dominique Ansel Bakery", "type": "🥐 Pastelería de culto", "note": "189 Spring St. El inventor del Cronut — el cruasán-donut que en 2013 tenía colas de 5 horas. Hoy sin cola, pero sigue siendo extraordinario."}]
+      },
+      { n: "Katz's Delicatessen", lat: 40.7223, lng: -73.9873, icon: "🥪",
+        info: "Abierto desde 1888 en el Lower East Side, Katz's es una reliquia viva de la Nueva York judía inmigrante que convirtió este barrio en el centro cultural del mundo ashkenazí entre 1880 y 1920. En su momento álgido, más de un millón de inmigrantes judíos vivían apiñados en el Lower East Side — la mayor concentración judía del planeta. El pastrami de Katz's se cura durante semanas, se ahúma y se corta a mano; los sándwiches pesan casi medio kilo. En la Segunda Guerra Mundial, el cartel «Send a salami to your boy in the army» hizo famoso el local en todo el país. En 1989 se filmó aquí la escena más famosa de «Cuando Harry encontró a Sally» — la mesa donde Meg Ryan fingió el orgasmo tiene una placa. La caja del establecimiento funciona con el mismo sistema de tickets de papel desde los años 40. El precio ronda los $25-30 por sándwich pero es una experiencia de historia pura. En el barrio de al lado: el Tenement Museum en Orchard Street.",
+        badge: "$25-30 · Desde 1888",
+        nearby: [{"n": "Tenement Museum", "type": "🏚 Museo de la inmigración", "note": "97 Orchard St, a 5 min. Los apartamentos reales donde vivieron familias inmigrantes 1863-1935. El museo de inmigración más íntimo del mundo. ~$30, reservar."}]
+      },
+      ]
+  },
+
+  // ───── DÍA 4 ─────
+  {
+    id: 4, label: "Día 4", color: "#3B6D11", bg: "#EAF3DE", textColor: "#27500A",
+    date: "Dom 26 abril", name: "Central Park · Upper West Side", city: "NYC",
+    route: [[40.7677,-73.9817],[40.7694,-73.9717],[40.7647,-73.9739],[40.7683,-73.9717],[40.7699,-73.9737],[40.7720,-73.9728],[40.7730,-73.9738],[40.7740,-73.9710],[40.7748,-73.9736],[40.7756,-73.9751],[40.7758,-73.9752],[40.7764,-73.9731],[40.7762,-73.9706],[40.7794,-73.9691],[40.7844,-73.9652],[40.7968,-73.9580],[40.7794,-73.9632],[40.7822,-73.9590],[40.7813,-73.9740],[40.7725,-73.9836]],
+    via: "Columbus Circle → Mall → Bethesda → Strawberry Fields → Belvedere → Reservoir → The Met → Guggenheim → Historia Natural → Lincoln Center",
+    places: [
+      { n: "Columbus Circle", lat: 40.7677, lng: -73.9817, icon: "🗿",
+        info: "El punto cero oficial desde el que se miden todas las distancias en el estado de Nueva York. La estatua de Colón sobre la columna (1892) fue un regalo de los italoamericanos para el 400 aniversario del viaje. El edificio Time Warner Center (2003) fue el primer gran rascacielos del siglo XXI en Nueva York. Whole Foods Market en su base: ideal para preparar el picnic del parque.",
+        badge: null,
+        nearby: [{"n": "Whole Foods Market (Columbus Circle)", "type": "🥗 Picnic provisions", "note": "10 Columbus Circle. Mejor opción para armar el picnic del parque."}]
+      },
+      { n: "Gapstow Bridge", lat: 40.7683, lng: -73.9717, icon: "🌁",
+        info: "El puente de piedra más fotografiado de Central Park, construido en 1896 sobre el estanque The Pond — el más cercano a la entrada sur del parque. Desde aquí la vista combina agua, roca, vegetación y el skyline de Midtown al fondo: es la imagen que más se asocia a Central Park en el cine. Apareció en «Home Alone 2» y en decenas de películas y series. El estanque que cruza tiene una historia peculiar: fue diseñado para parecer completamente natural, pero es artificial — excavado a mano en 1858 y alimentado por un sistema de tuberías subterráneo.",
+        badge: null },
+      { n: "Estatua de Balto", lat: 40.7694, lng: -73.9717, icon: "🐕",
+        info: "La estatua de bronce más acariciada de Central Park, cerca del zoo. Balto era un husky siberiano que en enero de 1925 lideró el último tramo de una carrera de trineos de 1.085 km a través de Alaska en plena ventisca — temperaturas de -40°C, vientos de huracán — para llevar el suero contra la difteria a la ciudad de Nome, cuya población infantil estaba muriendo. La operación, conocida como «la Gran Carrera por la Misericordia», involucró a 20 musher y más de 150 perros. Balto llegó a Nome a medianoche del 2 de febrero, en la oscuridad total, guiando el trineo ciego por instinto. La historia fue tan célebre que la estatua se inauguró en Central Park ese mismo año de 1925, mientras Balto seguía vivo. En 1995 Universal Studios hizo la película animada. El morro de la estatua está desgastado de tanto que la gente lo toca.",
+        badge: "Gratis",
+        nearby: []
+      },
+      { n: "Women's Rights Pioneers Monument", lat: 40.7647, lng: -73.9739, icon: "✊",
+        info: "El monumento más reciente de Central Park, inaugurado en agosto de 2020 para conmemorar el centenario de la 19ª Enmienda que dio a las mujeres el derecho al voto. Representa a tres figuras históricas del movimiento sufragista: Sojourner Truth, la abolicionista y activista que escapó de la esclavitud en 1826 y pronunció el discurso «Ain't I a Woman?»; Susan B. Anthony, que fue arrestada en 1872 por votar ilegalmente; y Elizabeth Cady Stanton, organizadora de la primera convención de derechos de la mujer en Seneca Falls en 1848. Dato significativo: fue el primer monumento de Central Park dedicado a mujeres reales — en 167 años de historia del parque, todos los monumentos anteriores eran de hombres. Está cerca del zoo, en el extremo sur del parque.",
+        badge: "Gratis · 2020",
+        nearby: []
+      },
+      { n: "Wollman Rink", lat: 40.7699, lng: -73.9737, icon: "⛸",
+        info: "La pista de patinaje sobre hielo más cinematográfica de Nueva York, con el skyline de rascacielos de Midtown directamente al fondo — la imagen que aparece en todas las postales navideñas. Construida en 1949, fue el escenario de una historia de incompetencia burocrática legendaria: en 1980 la ciudad inició unas obras de remodelación que se suponían duraban dos años y que se alargaron hasta 1986 sin terminar, gastando 12 millones de dólares. En 1986, Donald Trump ofreció hacerlo en cuatro meses por su cuenta. Lo terminó en tres meses y por debajo del presupuesto. En verano funciona como parque de atracciones y mini-golf.",
+        badge: null },
+      { n: "The Mall", lat: 40.7720, lng: -73.9728, icon: "🎭",
+        info: "El único camino completamente recto de Central Park, diseñado deliberadamente para hacer una sola concesión a la geometría urbana dentro del paisaje romántico e irregular del parque. Los olmos americanos que lo flanquean son los más grandes y antiguos de la Costa Este — algunos tienen más de 150 años. El olmo es un árbol casi extinguido en América por la enfermedad del olmo holandés; estos ejemplares de Central Park son supervivientes excepcionales y están monitorizados individualmente. Las estatuas de Shakespeare, Robert Burns, Walter Scott y Cristóbal Colón son de las pocas esculturas del parque visibles desde The Mall. Ha salido en decenas de películas y series.",
+        badge: null },
+      { n: "Sheep Meadow", lat: 40.7730, lng: -73.9738, icon: "☀️",
+        info: "La gran pradera abierta del centro-sur del parque, de 15 hectáreas, cuyo nombre viene de que hasta 1934 pastaban aquí ovejas reales — el rebaño del parque. El pastor y las ovejas vivían en el edificio que hoy es el Tavern on the Green. Las ovejas fueron expulsadas durante la Gran Depresión cuando la ciudad no podía pagar su mantenimiento. Hoy es el lugar de reunión más democrático del parque: telas de playa, frisbees, grupos de amigos, estudiantes de NYU, familias, turistas. Todos en el mismo prado mirando los mismos rascacielos. Se cierra en invierno para que el césped descanse.",
+        badge: null },
+      { n: "Imagine — Mosaico de John Lennon", lat: 40.7756, lng: -73.9751, icon: "✌",
+        info: "El mosaico circular de mármol blanco y negro con la palabra IMAGINE en el centro, en el corazón de Strawberry Fields, es uno de los monumentos más visitados de Central Park. Lo donó en 1985 la ciudad de Nápoles — la ciudad italiana eligió este diseño inspirado en los pavimentos romanos como símbolo de paz y hermandad. El mosaico está siempre rodeado de flores, fotografías y velas que dejan los visitantes. Casi siempre hay un músico tocando canciones de Lennon o de los Beatles en las inmediaciones. El Dakota Building, donde Lennon vivió desde 1973 y donde fue asesinado el 8 de diciembre de 1980, está literalmente enfrente — cruzas la calle y estás ante la entrada donde ocurrió. Yoko Ono sigue viviendo en el Dakota. Cada 8 de diciembre y cada 9 de octubre (cumpleaños de Lennon) se celebran aquí concentraciones espontáneas de miles de personas de todo el mundo.",
+        badge: "Gratis · Icónico",
+        nearby: []
+      },
+      { n: "Strawberry Fields", lat: 40.7758, lng: -73.9752, icon: "🎵",
+        info: "Memorial dedicado a John Lennon, que vivía en el Dakota Building — el sombrío edificio de apartamentos de ladrillo oscuro que verás directamente enfrente, en el 72 de Central Park West. El 8 de diciembre de 1980, Lennon fue asesinado en la entrada de ese edificio por Mark David Chapman, que había pedido su autógrafo esa misma tarde. El mosaico «Imagine» en el suelo, donado por la ciudad de Nápoles, está siempre rodeado de flores, fotos y velas dejadas por peregrinos de todo el mundo. Casi siempre hay un músico tocando sus canciones. El Dakota tiene su propia historia sombría: fue construido en 1884 en un momento en que el Upper West Side era tan remoto que lo llamaban «las Dakotas» — fue también el escenario de la película Rosemary's Baby de Polanski (1968), que filmó el exterior del edificio. Yoko Ono sigue viviendo allí.",
+        badge: null,
+        nearby: [{"n": "Café Lalo", "type": "☕ Café famoso", "note": "201 W 83rd St. El café que sale en la película «You've Got Mail». Amplia carta de tartas artesanas y cappuccinos."}, {"n": "Levain Bakery (UWS)", "type": "🍪 Galletas legendarias", "note": "351 Amsterdam Ave. La galleta de chocolate chip más famosa de NY — enorme, caliente y perfectamente sin hornear en el centro."}]
+      },
+      { n: "Bethesda Terrace y Fuente", lat: 40.7740, lng: -73.9710, icon: "⛲",
+        info: "La fuente «El Ángel de las Aguas» (1873) es la única escultura encargada originalmente para Central Park — el resto fueron donadas o añadidas después. La diseñó Emma Stebbins, la primera mujer en recibir un encargo artístico público en la historia de Nueva York. El ángel representa la leyenda del Ángel de Bethesda del Evangelio de Juan — una referencia a la apertura del acueducto de Croton que por primera vez trajo agua potable limpia a Manhattan, poniendo fin a las epidemias de cólera. El arco bajo la terraza tiene el techo más elaborado de todo el parque: 49.000 azulejos de Encaustic Minton colocados a mano durante 3 años. Ha aparecido en más películas que casi cualquier otro lugar de Nueva York.",
+        badge: null,
+        nearby: [{"n": "Loeb Boathouse Restaurant", "type": "🛶 Almuerzo con vistas", "note": "East 72nd St, Central Park. Almuerzo junto al lago con vistas al parque. Se pueden alquilar barcas de remo."}]
+      },
+      { n: "Alice in Wonderland", lat: 40.7748, lng: -73.9736, icon: "🍄",
+        info: "La escultura de bronce de 1959 representa a Alicia sentada sobre una gran seta, rodeada del Sombrerero Loco, el Gato de Cheshire, la Liebre de Marzo y el Conejo Blanco. Fue donada al parque por George Delacorte, el fundador de Dell Publishing, en honor a su esposa fallecida. Es la única escultura de Central Park diseñada específicamente para que los niños trepen por ella — y lo hacen. Está junto al lago Conservatory Water, donde cada domingo de primavera y verano se celebran regatas de barcos de radiocontrol, una tradición que llevan haciendo los vecinos del Upper East Side desde 1916.",
+        badge: null },
+      { n: "Bow Bridge", lat: 40.7764, lng: -73.9731, icon: "🌉",
+        info: "El puente de hierro fundido más romántico de Central Park, construido en 1862 para cruzar The Lake. Su forma de arco suave — como la curva de un arco de violín, de ahí el nombre — y sus ornamentos de hierro lo convierten en el puente más fotografiado del parque. Desde el centro del puente, la vista hacia el este muestra los rascacielos del Upper West Side reflejados en el agua; hacia el oeste, el Ramble y el bosque. Ha aparecido en «Cuando Harry encontró a Sally», «Kramer contra Kramer» y decenas de películas más. Es el lugar favorito de propuestas de matrimonio de todo Central Park.",
+        badge: null },
+      { n: "The Lake", lat: 40.7758, lng: -73.9752, icon: "🛶",
+        info: "El lago más grande de Central Park, de 4 hectáreas, artificialmente creado en 1858 drenando un pantano. El Loeb Boathouse, en su orilla este, alquila barcas de remo desde 1954 — una de las tradiciones más neoyorquinas que existen. El restaurante del Boathouse es uno de los más bonitos de la ciudad, con las mesas al borde del agua mirando hacia el lago y los rascacielos al fondo. Por la orilla oeste está Strawberry Fields. Las tortugas y los patos son residentes permanentes.",
+        badge: null },
+      { n: "Belvedere Castle", lat: 40.7794, lng: -73.9691, icon: "🏰",
+        info: "Construido en 1869 como «folly» — un edificio decorativo sin ninguna función real cuyo único propósito era dar un punto de destino a los paseantes. Su único propósito era que la gente contemplase el lago desde él. Irónicamente, hoy alberga la estación meteorológica oficial de Central Park, en funcionamiento desde 1919 — las temperaturas que escuchas en los partes del tiempo de Nueva York se miden aquí. Está en Vista Rock, el punto más alto del parque. Debajo, el Jardín de Shakespeare tiene todas las plantas y flores mencionadas en sus obras (más de 80 especies), cada una con la placa con el pasaje exacto donde aparece. Gratuito.",
+        badge: "Gratis" },
+      { n: "The Ramble", lat: 40.7762, lng: -73.9706, icon: "🌿",
+        info: "Zona boscosa de 16 hectáreas en el corazón de Central Park, diseñada deliberadamente para que parezca un bosque antiguo e indomado — senderos sinuosos, puentes de piedra, arroyos artificiales, cuevas de roca. Es el único lugar del parque donde Manhattan desaparece completamente: rodeado de árboles no se ven rascacielos ni se oye el tráfico. Los diseñadores Olmsted y Vaux lo pensaron como un refugio de contemplación para la clase trabajadora que no podía permitirse viajes al campo. Hoy es el mejor punto de avistamiento de aves de toda la ciudad: más de 200 especies han sido registradas durante las migraciones de primavera y otoño. Los ornitólogos neoyorquinos se levantan antes del amanecer y vienen aquí.",
+        badge: null,
+        nearby: []
+      },
+      { n: "Jacqueline Kennedy Onassis Reservoir", lat: 40.7844, lng: -73.9652, icon: "💧",
+        info: "El embalse de 43 hectáreas que domina el centro-norte del parque tomó el nombre de Jackie Kennedy en 1994, tras su muerte, en reconocimiento a su papel en preservar el patrimonio arquitectónico de Nueva York — fue ella quien encabezó la campaña para salvar Grand Central en los años 60. El sendero de tierra que rodea el embalse (2,4 km) es uno de los lugares para correr más famosos del mundo; los tabloides de Nueva York llevan décadas publicando fotos de famosos corriendo aquí. El agua del embalse ya no abastece la ciudad — fue reemplazado por depósitos subterráneos en los años 90 — pero el nivel del agua se mantiene artificialmente para el paisaje.",
+        badge: null },
+      { n: "Museo Guggenheim", lat: 40.7822, lng: -73.9590, icon: "🎨",
+        info: "El museo de arte más fotogénico de Nueva York, diseñado por Frank Lloyd Wright en 1959 — su única obra en Manhattan y uno de los edificios del siglo XX más influyentes del mundo. La espiral de hormigón blanco fue tan controvertida cuando se construyó que 21 artistas firmaron una carta protestando porque las paredes inclinadas hacían imposible colgar cuadros correctamente. Wright respondió que los cuadros debían colgarse como joyas en una espiral ascendente, no en una pared plana. La colección incluye Kandinsky, Picasso, Chagall, Mondrian y la mayor colección de Paul Klee del mundo. El edificio en sí roba más protagonismo que las obras. Solo ver desde fuera es gratis y merece la foto.",
+        badge: "~$30" },
+      { n: "The Ravine", lat: 40.7968, lng: -73.9580, icon: "🌲",
+        info: "El único bosque de Manhattan, en la parte más septentrional de Central Park — un rincón que la mayoría de los turistas nunca alcanza. Un arroyo artificial de 450 metros corre entre rocas de granito y árboles de más de 100 años; en otoño es espectacular. Fue diseñado en 1871 como una evocación de los paisajes boscosos del norte del estado de Nueva York. Está a 25 minutos andando de la entrada sur del parque. Si el tiempo acompaña y las piernas aguantan, el silencio que hay aquí — dentro de una ciudad de 8 millones de personas — es casi surrealista.",
+        badge: null },
+      { n: "Museo Metropolitano de Arte (The Met)", lat: 40.7794, lng: -73.9632, icon: "🖼",
+        info: "El museo de arte más grande de América y uno de los cinco más visitados del mundo, fundado en 1870. Tiene más de 2 millones de obras abarcando 5.000 años de historia humana: desde una momia egipcia del año 3000 a.C. hasta Jackson Pollock; desde armaduras medievales japonesas hasta Van Gogh y Velázquez. El edificio principal en la 5th Ave fue diseñado en 1902 en estilo Beaux-Arts, pero ha crecido tanto que hoy ocupa 19 hectáreas — si intentaras ver todas las obras durante 30 segundos cada una, tardarías 18 años. La estrategia recomendada: elige 3-4 salas que te interesen y sumérgete en ellas. El Roof Garden Bar (primavera-otoño) tiene cócteles con vistas a Central Park y al skyline de Midtown — está incluido en la entrada y es uno de los mejores terrazas de Nueva York.",
+        badge: "~$30 · Enorme",
+        nearby: [{"n": "The Met Roof Garden Bar", "type": "🌿 Bar con vistas", "note": "En la azotea del propio museo (temporada primavera-otoño). Cócteles con vistas a Central Park y el skyline de Midtown. Incluido en la entrada."}, {"n": "Café Sabarsky (Neue Galerie)", "type": "🥐 Café vienés", "note": "1048 5th Ave. Cafetería vienesa con tarta Sacher, strudel y Wiener Schnitzel. Ambiente de Viena en Manhattan."}]
+      },
+      { n: "Museo Americano de Historia Natural", lat: 40.7813, lng: -73.9740, icon: "🦕",
+        info: "El museo más querido por los neoyorquinos, en el Upper West Side desde 1869. 45 salas permanentes con más de 34 millones de especímenes y objetos. La sala de dinosaurios es una de las más completas del mundo; el Brontosaurus en el hall de entrada tiene el cuello alzado hacia el techo de cuatro pisos. El Planetario Rose Center (el gran cubo de cristal con la esfera dentro que ves desde la calle Central Park West) es el planetario más avanzado de América. La película «Noche en el Museo» se rodó aquí — en la película los esqueletos cobran vida; en la realidad, el edificio cierra a las 17:30 y los guardias lo dejan todo a oscuras. Pensar si merece la pena entrar dentro vs. ver solo el exterior del Planetario.",
+        badge: "~$28",
+        nearby: [{"n": "Daily Provisions (UWS)", "type": "☕ Bakery & café", "note": "375 Amsterdam Ave. De Danny Meyer. Famosa por sus crullers y café. Uno de los mejores desayunos del UWS."}]
+      },
+      { n: "Lincoln Center", lat: 40.7725, lng: -73.9836, icon: "🎼",
+        info: "El mayor complejo de artes escénicas del mundo, inaugurado en 1962 en el Upper West Side. En su plaza de travertino blanco conviven tres instituciones: la Metropolitan Opera (el mejor teatro de ópera de América), la Filarmónica de Nueva York (fundada en 1842, la orquesta más antigua del hemisferio occidental) y el Ballet de la Ciudad de Nueva York. El edificio fue construido demoliendo el barrio de San Juan Hill, donde vivían 7.000 familias negras e hispanas — el mismo barrio que sirvió de inspiración para «West Side Story», filmada aquí un año antes de la demolición. La plaza con la fuente es extraordinariamente fotogénica, especialmente de noche. A veces hay actuaciones gratuitas al aire libre en verano.",
+        badge: null,
+        nearby: [{"n": "Café Luxembourg", "type": "🥖 Bistró francés", "note": "200 W 70th St. Bistró con boiserie y espejos, favorito de los locales del UWS desde 1983. Excelentes cócteles y steak frites."}]
+      },
+    ]
+  },
+
+  // ───── DÍA 5 ─────
+  {
+    id: 5, label: "Día 5", color: "#8B4513", bg: "#F5EDE6", textColor: "#5C2E0A",
+    date: "Lun 27 abril", name: "Washington D.C. · Llegada", city: "DC",
+    route: [[38.8974,-77.0069],[38.8899,-77.0091],[38.8906,-77.0046],[38.8895,-77.0353],[38.8893,-77.0502],[38.8807,-77.0365]],
+    via: "Union Station → Capitol → Mall → Lincoln Memorial → Jefferson Memorial",
+    places: [
+      { n: "Tren a Washington · Union Station", lat: 38.8974, lng: -77.0069, icon: "🚂",
+        info: "El tren Amtrak desde la estación Moynihan Train Hall (Penn Station) sale a las 7:04 AM. La estación Moynihan es el hall de entrada reformado del Farley Post Office Building, un edificio Beaux-Arts de 1912 justo al lado de Penn Station — cuando demolieron Penn Station en 1963 fue uno de los mayores crímenes arquitectónicos de la historia americana, y Moynihan es el intento de compensación. El trayecto dura unas 3,5 horas. La Union Station de Washington DC (1907) es una de las estaciones más bellas del país: techos abovedados de 30 metros, mármol de Carrara y una arquitectura que lo hace parecer más un templo romano que una estación de tren. El Capitolio está a 18 minutos andando.",
+        badge: "Tren 7:04h" },
+      { n: "Capitolio de los EEUU", lat: 38.8899, lng: -77.0091, icon: "🏛",
+        info: "La sede del Congreso americano, construida en 1800 y ampliada varias veces, es el edificio más importante de la democracia americana. La cúpula de hierro colado — que pesa 4.000 toneladas — fue terminada durante la Guerra Civil, cuando Lincoln insistió en continuar las obras como símbolo de que la Unión seguiría en pie. En el interior, la Rotonda tiene pinturas de los Padres Fundadores y la famosa cúpula de 55 metros. Se puede visitar de forma gratuita, pero hay que reservar con meses de antelación y llegar una hora antes para los controles de seguridad. La visita incluye el Salón Nacional de las Estatuas, donde cada estado tiene dos estatuas de sus personajes más ilustres. La Corte Suprema y la Biblioteca del Congreso están a 5 minutos andando.",
+        badge: "⚠ Reserva" },
+      { n: "Corte Suprema de los EEUU", lat: 38.8906, lng: -77.0046, icon: "⚖️",
+        info: "El tribunal más poderoso del mundo, construido en 1935 en mármol blanco de Vermont. El lema grabado sobre las columnas — «Equal Justice Under Law» — fue una concesión tardía: el arquitecto lo añadió solo después de que los jueces protestaran porque el edificio original no tenía ninguna inscripción. La fachada neoclásica fue diseñada deliberadamente para transmitir permanencia e imparcialidad. Las audiencias del pleno son públicas y gratuitas (octubre-junio), pero las colas empiezan antes del amanecer. El museo interior es gratuito y explica cómo funciona el sistema judicial americano con casos históricos: Brown vs. Board of Education, Roe vs. Wade, Bush vs. Gore.",
+        badge: "Gratis" },
+      { n: "Monumento a Washington", lat: 38.8895, lng: -77.0353, icon: "🗼",
+        info: "El obelisco de mármol más alto del mundo: 169 metros. Tardó 40 años en construirse (1848-1884) — la construcción se interrumpió durante la Guerra Civil y el dinero escaseó varias veces. Si miras con atención la fachada, verás una línea horizontal a un tercio de la altura donde el color del mármol cambia ligeramente: es el punto donde se reanudaron las obras después de años de pausa, con mármol de una cantera diferente. El interior tiene un ascensor que sube en 70 segundos; las vistas desde arriba son las mejores del National Mall. Requiere reserva con anticipación; hay también tickets de taquilla el mismo día a primera hora.",
+        badge: "Gratis" },
+      { n: "Memorial de Lincoln", lat: 38.8893, lng: -77.0502, icon: "🎖",
+        info: "El monumento más emotivo de Washington, construido en 1922 al final del National Mall. La estatua de Lincoln sentado mide 5,8 metros de alto — si se pusiera de pie, mediría casi 30 metros. Las palabras del Discurso de Gettysburg y el Segundo Discurso Inaugural están grabadas en las paredes laterales. Los escalones del memorial son el lugar histórico más importante del movimiento por los derechos civiles: aquí Martin Luther King pronunció el discurso «I Have a Dream» el 28 de agosto de 1963 ante 250.000 personas. Una placa en el suelo marca el escalón exacto donde King se paró. En 1939, la contralto Marian Anderson cantó aquí tras ser prohibida en el Constitution Hall por ser negra. De noche, iluminado y reflejado en el estanque espejo, es uno de los paisajes más poderosos de América.",
+        badge: "Gratis",
+        nearby: [{"n": "Founding Farmers (Pennsylvania Ave)", "type": "🌾 Americana farm-to-table", "note": "1924 Pennsylvania Ave NW. Cocina americana con ingredientes de granja. Uno de los favoritos de Washington."}]
+      },
+      { n: "Memorial de Jefferson", lat: 38.8807, lng: -77.0365, icon: "✍️",
+        info: "El memorial de estilo neoclásico en la orilla del Tidal Basin, inaugurado en 1943. La rotonda circular, inspirada en el Panteón de Roma — que Jefferson conocía de sus años como embajador en París — alberga una estatua de 5,8 metros del tercer presidente. Jefferson fue el autor principal de la Declaración de Independencia a los 33 años, fundador de la Universidad de Virginia, arquitecto aficionado, inventor del arado moderno y el primer americano en llevar pasta al país (la trajo de Italia). Las frases grabadas en las paredes incluyen: «Juro sobre el altar de Dios eterna hostilidad a toda forma de tiranía sobre la mente humana». En primavera, los cerezos japoneses que rodean el Tidal Basin están en flor — el regalo del alcalde de Tokio en 1912.",
+        badge: "Gratis" },
+    ]
+  },
+
+  // ───── DÍA 6 ─────
+  {
+    id: 6, label: "Día 6", color: "#6B3D8A", bg: "#F0EAF7", textColor: "#3D1F5A",
+    date: "Mar 28 abril", name: "Washington D.C. · Museos & Vuelta", city: "DC",
+    route: [[38.8883,-77.0199],[38.8913,-77.0367],[38.8976,-77.0366],[38.8921,-77.0479],[38.8763,-77.0747],[38.8951,-77.0351]],
+    via: "Smithsonian → Casa Blanca → Vietnam Memorial → Arlington → Tren vuelta",
+    places: [
+      { n: "Smithsonian · Museo del Aire y del Espacio", lat: 38.8883, lng: -77.0199, icon: "🚀",
+        info: "El museo más visitado del mundo, con más de 8 millones de visitantes al año. En su nave principal cuelgan del techo el avión de los hermanos Wright (el original de Kitty Hawk, 1903), el módulo de comando del Apolo 11 que fue a la Luna en 1969, el Spirit of St. Louis de Lindbergh (el primer vuelo transatlántico en solitario, 1927) y el Bell X-1 de Chuck Yeager (el primer avión en romper la barrera del sonido, 1947). Todo original, todo en el mismo edificio. La entrada es gratuita — financiada por el Estado americano para que cualquier ciudadano pueda ver cómo llegaron a la Luna.",
+        badge: "Gratis ⚠ Reserva",
+        nearby: [{"n": "Mitsitam Café (National Museum of the American Indian)", "type": "🌽 Cocina nativa americana", "note": "4th St & Independence Ave SW. Cocina de las 5 grandes regiones nativas de América. Imperdible."}]
+      },
+      { n: "Smithsonian · Historia Natural · Diamante Hope", lat: 38.8913, lng: -77.0367, icon: "💎",
+        info: "El Museo de Historia Natural del Smithsonian, gratuito como todos los museos federales. El Diamante Hope es la piedra preciosa más famosa del mundo: 45,52 quilates de diamante azul de un azul imposible, con una maldición adjunta que incluye la ejecución de María Antonieta (lo llevaba ella cuando la guillotinaron), la ruina de varias fortunas europeas y la muerte en accidente de varios de sus propietarios sucesivos. El diamante llega hasta sus actuales manos — el Smithsonian — porque el joyero Harry Winston lo donó en 1958 por correo ordinario, en una caja marrón, asegurado por 1 millón de dólares. El cartero que lo entregó llegó a decir que no sabía que llevaba nada especial.",
+        badge: "Gratis" },
+      { n: "Casa Blanca", lat: 38.8976, lng: -77.0366, icon: "🏠",
+        info: "La residencia oficial del presidente desde 1800, cuando John Adams se mudó antes de que estuviera terminada. En 1814, durante la guerra contra los ingleses, fue incendiada — las paredes exteriores sobrevivieron ennegrecidas y fueron pintadas de blanco para tapar las marcas, lo que popularizó el nombre «Casa Blanca». Theodore Roosevelt fue el primero en llamarla oficialmente así en 1901. Tiene 132 habitaciones, 35 baños, una piscina, una bolera, un cine y una sala de situaciones subterránea. Los tours del interior requieren reserva con meses de antelación a través del congresista de tu distrito — prácticamente imposible como turista extranjero. El jardín norte (North Lawn) se puede fotografiar libremente desde la Pennsylvania Ave.",
+        badge: "Gratis exterior",
+        nearby: [{"n": "Old Ebbitt Grill", "type": "🦪 Taberna histórica", "note": "675 15th St NW. A 2 min de la Casa Blanca. El bar/restaurante más antiguo de Washington (1856). Ostras y burger de culto."}]
+      },
+      { n: "Memorial de los Veteranos de Vietnam", lat: 38.8921, lng: -77.0479, icon: "🪨",
+        info: "El memorial más emocionalmente poderoso de Washington, diseñado por Maya Lin, una estudiante de arquitectura de 21 años que ganó el concurso en 1981 entre 1.421 propuestas. La idea fue polémica desde el principio — nada de héroes en mármol blanco, solo dos muros negros de granito hundiéndose en la tierra con 58.318 nombres grabados en orden cronológico de muerte. Los veteranos que sobrevivieron a la guerra quedaron devastados y divididos por su recibimiento en casa: muchos fueron insultados al volver. El memorial fue pensado para sanar esa herida. Los visitantes se acercan, buscan nombres, dejan cartas, flores, botellas de cerveza. El reflejo del visitante en el granito negro pone al que mira entre los muertos — ese efecto es completamente intencionado.",
+        badge: "Gratis" },
+      { n: "Cementerio Nacional de Arlington", lat: 38.8763, lng: -77.0747, icon: "🪖",
+        info: "El cementerio militar más importante de América, con más de 400.000 tumbas en 253 hectáreas de colinas arboladas sobre el río Potomac. Fue creado en 1864 sobre los terrenos de la mansión del general confederado Robert E. Lee — confiscada por el ejército de la Unión al inicio de la Guerra Civil, en uno de los gestos más calculadamente simbólicos de la historia americana. La Tumba del Soldado Desconocido, con su guardia de honor 24 horas los 365 días del año, tiene el relevo de guardia cada 30 minutos en verano y cada hora en invierno — es uno de los rituales militares más solemnes del mundo. La tumba de JFK con la llama eterna y la de Jackie Kennedy Onassis están a pocos metros. La vista del Memorial Bridge y Washington desde las colinas es impresionante.",
+        badge: "Gratis" },
+      { n: "Tren de vuelta a Nueva York", lat: 38.8951, lng: -77.0351, icon: "🚂",
+        info: "El tren sale a las 16:04 desde Union Station, llega a Penn Station NYC a las 19:24 aprox. Desde Penn Station al hotel son 18 min andando por la 8th Ave. Última noche en Nueva York — buen momento para un último paseo por Times Square.",
+        badge: "Tren 16:04" },
+    ]
+  },
+
+  // ───── DÍA 7 ─────
+  {
+    id: 7, label: "Día 7", color: "#BA7517", bg: "#FAEEDA", textColor: "#633806",
+    date: "Mié 29 abril", name: "Flatiron · Village · High Line · Hudson Yards", city: "NYC",
+    route: [[40.7588,-74.0002],[40.7412,-73.9881],[40.7411,-73.9897],[40.7383,-73.9891],[40.7298,-73.9964],[40.7309,-73.9973],[40.7310,-74.0015],[40.7336,-74.0023],[40.7424,-74.0059],[40.7488,-74.0048],[40.7480,-74.0048],[40.7538,-74.0022],[40.7648,-74.0012]],
+    via: "Hotel → Flatiron → Union Square → West Village → Stonewall → High Line → Hudson Yards → Intrepid",
+    places: [
+      { n: "Madison Square Park", lat: 40.7412, lng: -73.9881, icon: "🌿",
+        info: "El parque que dio nombre al Madison Square Garden — aunque el Garden se construyó aquí, luego se movió y hoy está en Hell's Kitchen, conservando el nombre original de este parque. El Madison Square Park original fue el corazón del Manhattan elegante del siglo XIX: aquí estaba el primer Madison Square Garden de Stanford White (1890), un edificio lujoso donde se celebraban circos, conciertos y exposiciones. White fue asesinado a tiros en la azotea del propio edificio en 1906 por el marido de su amante — el primer «crimen del siglo» cubierto masivamente por la prensa. El Shake Shack original nació en este parque en 2004 como carrito de comida temporal. El parque tiene esculturas contemporáneas rotativas y el Fifth Avenue Rooftop Bar a 1 minuto para vistas del Flatiron.",
+        badge: null,
+        nearby: [{"n": "Shake Shack (original)", "type": "🍔 El original", "note": "Madison Square Park. El primer Shake Shack del mundo — nació aquí en 2004 como puesto en el parque."}]
+      },
+      { n: "Flatiron Building", lat: 40.7411, lng: -73.9897, icon: "🔺",
+        info: "Terminado en 1902 y formalmente llamado Fuller Building (por la empresa constructora), lo rebautizaron popularmente «Flatiron» por su forma de plancha. Fue uno de los primeros rascacielos de Nueva York y su existencia causó verdadero pánico ciudadano: los neoyorquinos estaban convencidos de que se caería con el viento. En lugar de caerse, el edificio concentra y canaliza el viento de Broadway de tal manera que en los primeros años la policía tenía que dispersar continuamente a los hombres que se apostaban en la 23rd Street para ver las faldas de las mujeres levantadas por las ráfagas — de esa costumbre viene la expresión «23 skidoo» (23, fuera de aquí). La punta triangular del edificio mide apenas 1,8 metros de ancho. Estuvo a punto de ser demolido varias veces en el siglo XX; hoy es uno de los edificios más fotografiados del mundo.",
+        badge: null,
+        nearby: [{"n": "Eataly NYC Flatiron", "type": "🇮🇹 Mercado italiano", "note": "200 5th Ave (junto al Flatiron). El mayor mercado-restaurante italiano del mundo fuera de Italia."}]
+      },
+      { n: "Union Square Park", lat: 40.7383, lng: -73.9891, icon: "🗿",
+        info: "La plaza que ha sido el corazón del activismo y la protesta en Nueva York durante 150 años. En 1882 se celebró aquí el primer Día del Trabajo de la historia americana. Aquí se concentraron 250.000 personas cuando empezó la Primera Guerra Mundial, y otro cuarto de millón cuando terminó. Después del 11-S, fue el lugar espontáneo de reunión y duelo de toda la ciudad. Las estatuas son notables: Washington a caballo (1856), Lincoln de pie (1870), Gandhi (1986) y La Marquesa de Lafayette. El Greenmarket funciona lunes, miércoles, viernes y sábados por la mañana — uno de los mejores mercados de agricultores de la ciudad. El edificio de Barnes & Noble al norte conserva la fachada del Tammany Hall, la sede del legendario aparato político corrupto que gobernó Nueva York durante décadas.",
+        badge: null,
+        nearby: [{"n": "Burlington Coat Factory", "type": "🛍 Moda y hogar outlet", "note": "707 6th Ave, a 5 min. Tienda de ropa, complementos y hogar con precios outlet. Especialmente buena para ropa de abrigo, maletas y ropa de marca con descuento."}, {"n": "Greenmarket Union Square", "type": "🥬 Mercado de agricultores", "note": "L/Mi/V/S por la mañana en la plaza. Uno de los mejores mercados de producto fresco de NYC — frutas, quesos, flores, panes artesanales."}, {"n": "The Strand Bookstore", "type": "📚 Librería icónica desde 1927", "note": "828 Broadway, a 2 min. «18 millas de libros». Nuevos, usados y descatalogados. Una de las librerías independientes más grandes del mundo."}]
+      },
+      { n: "Washington Square Park", lat: 40.7309, lng: -73.9973, icon: "🌳",
+        info: "El corazón del Village bohemio, construido sobre un cementerio del siglo XVIII donde yacen más de 20.000 personas de epidemias de fiebre amarilla y viruela — siguen ahí, bajo el parque, sin excavar. El olmo del noroeste del parque se usaba como horca pública hasta 1830. El arco de mármol blanco de la entrada norte (1895) tiene una historia secreta: en 1917, Marcel Duchamp y un grupo de dadaístas subieron al arco de noche con un globo de helio, leyeron un manifiesto y declararon la «República Libre de Greenwich Village» — el acto fundacional del espíritu del barrio. NYU rodea el parque por tres lados; los estudiantes y los ajedrecistas profesionales de las mesas del suroeste coexisten con músicos callejeros y oradores espontáneos. Cualquier tarde hay algo pasando.",
+        badge: null,
+        nearby: [{"n": "Fanelli's Cafe", "type": "🍺 Bar histórico", "note": "94 Prince St, SoHo. Bar desde 1922 en la misma esquina. Hamburguesas y cervezas en ambiente de pub auténtico."}, {"n": "Jack's Wife Freda (SoHo)", "type": "🍳 Todo el día", "note": "224 Lafayette St. Favorito de los locales del Village. Cocina mediterránea todo el día."}]
+      },
+      { n: "Triangle Shirtwaist Factory Memorial (Brown Building)", lat: 40.7298, lng: -73.9964, icon: "🔥",
+        info: "El 25 de marzo de 1911, a las 4:40 de la tarde, un cigarrillo mal apagado prendió fuego a los pisos 8, 9 y 10 del edificio Asch — este edificio, hoy parte de la NYU, en la esquina de Washington Place y Greene Street, a 50 metros de donde estás parado en Washington Square Park. En 15 minutos murieron 146 personas, casi todas mujeres jóvenes inmigrantes judías e italianas de entre 13 y 23 años. Las escaleras de incendio colapsaron. Las escaleras interiores estaban cerradas con llave — los dueños las cerraban para evitar robos y paradas sindicales. Las escaleras de los bomberos solo llegaban al sexto piso. Muchas saltaron al vacío. Los dueños fueron absueltos. La indignación fue tal que en los meses siguientes el Estado de Nueva York aprobó más de 30 leyes de seguridad laboral que cambiaron para siempre las condiciones de trabajo en todo el país — es el origen directo de las leyes laborales modernas. En la fachada del edificio hay una placa y el memorial permanente inaugurado en 2023.",
+        badge: "Memorial gratuito · Landmark Nacional",
+        nearby: [{"n": "Katz's Delicatessen", "type": "🥪 Lower East Side desde 1888", "note": "205 E Houston St, a 15 min andando. En el mismo barrio donde vivían las víctimas de la fábrica."}]
+      },
+      { n: "Bleecker Street + Gay Street", lat: 40.7310, lng: -74.0015, icon: "🌈",
+        info: "Bleecker St es la arteria principal del West Village, llena de pequeños restaurantes y tiendas. Gay Street es una callecita de apenas una manzana — literalmente no llega a los 100 metros — que dobla de Christopher Street hacia el norte. Su nombre no tiene que ver con la comunidad LGBTQ+: aparece en mapas de 1833, cuando «gay» significaba alegre. Fue escenario de «My Sister Eileen» (1942) y más tarde de «Ruth McKenney's New Yorker». El West Village es históricamente el barrio LGBTQ+ de Nueva York — la razón por la que el Stonewall está aquí, en Christopher Street, a tres minutos de esta esquina. Las casas adosadas de ladrillo de Perry Street, Charles Street y Grove Street son el West Village de película.",
+        badge: null,
+        nearby: [{"n": "Buvette (West Village)", "type": "🥂 Gastroteca francesa", "note": "42 Grove St. Pequeño gastrobar francés de culto en el West Village. Desayuno, brunch y vino natural."}, {"n": "Bleecker Street Pizza", "type": "🍕 Pizza por porciones", "note": "69 7th Ave South. Una de las mejores pizzas por porciones de NYC."}]
+      },
+      { n: "Stonewall Inn & Christopher Street", lat: 40.7336, lng: -74.0023, icon: "🏳️‍🌈",
+        info: "En la madrugada del 28 de junio de 1969, la policía entró al Stonewall Inn — un bar gay de mala muerte propiedad de la mafia que pagaba sobornos a la policía — para hacer una redada rutinaria. Esa noche, por primera vez, los clientes no se dejaron llevar. La resistencia duró seis días; los disturbios del Stonewall son el momento fundacional del movimiento moderno por los derechos LGBTQ+ en todo el mundo. El año siguiente nació el primer desfile del orgullo gay de la historia, en el aniversario de aquella noche. En 2016, Obama lo designó monumento nacional — el primero dedicado a la historia LGBTQ+ en EEUU. Christopher Street fue durante décadas la arteria principal de la vida gay neoyorquina. El bar sigue abierto. La primera persona en ser arrestada aquella noche fue Stormé DeLarverie, una mujer negra cuya resistencia al arresto — «¿Por qué no hacéis algo?», gritó a la multitud — fue la chispa que lo encendió todo.",
+        badge: "Monumento Nacional",
+        nearby: [{"n": "The Stonewall Inn (bar)", "type": "🍺 Bar histórico", "note": "53 Christopher St. El propio bar sigue abierto. Tomar una copa aquí tiene un peso histórico difícil de igualar en ningún otro bar del mundo."}]
+      },
+      { n: "Chelsea Market", lat: 40.7424, lng: -74.0059, icon: "🛍",
+        info: "Antiguo complejo de fábricas de National Biscuit Company (Nabisco) donde en 1912 se inventó la galleta Oreo — la más vendida en el mundo. El edificio fue construido en 1898 aprovechando los túneles subterráneos que conectaban con el muelle del Hudson para recibir materia prima directamente de los barcos. Cuando Nabisco se fue en 1958, el edificio fue abandonado durante décadas. Su reconversión en mercado gastronómico (1997) fue pionera del modelo que hoy llaman «mercado de chefs». Los arcos de ladrillo rojo del interior, los ladrillos originales de 1898 y los fragmentos de maquinaria industrial conservados en las paredes hacen del espacio uno de los más fotogénicos de la ciudad. Conecta directamente con la entrada sur del High Line.",
+        badge: null,
+        nearby: [{"n": "Los Tacos No. 1 (Chelsea Market)", "type": "🌮 Tacos", "note": "Dentro de Chelsea Market. Los mejores tacos de NYC — tortillas hechas a mano."}, {"n": "La Devozione", "type": "🍝 Pasta italiana", "note": "Dentro de Chelsea Market. Pasta fresca artesana en formato omakase o a la carta."}, {"n": "Alf Bakery", "type": "🥐 Panadería", "note": "Dentro de Chelsea Market. Pequeña panadería de culto — croissants y pasteles de corteza perfecta."}]
+      },
+      { n: "Little Island", lat: 40.7488, lng: -74.0048, icon: "🌸",
+        info: "Un parque artificial construido sobre el río Hudson en 2021, diseñado por el arquitecto Thomas Heatherwick (el mismo del Vessel) sobre los restos de los muelles Pier 54 y 55. Los muelles originales fueron destruidos por el huracán Sandy en 2012; el filántropo Barry Diller financió la reconstrucción con 260 millones de dólares. La estructura se sostiene sobre 132 pilotes en forma de tulipán de distintas alturas, creando una topografía ondulante sobre el agua — de ahí que la isla parezca flotar. Tiene jardines, un anfiteatro con programación cultural gratuita en verano y vistas al río Hudson y a Nueva Jersey. Es uno de los proyectos urbanísticos más creativos de Nueva York en décadas.",
+        badge: "Gratis" },
+      { n: "The High Line", lat: 40.7480, lng: -74.0048, icon: "🛤",
+        info: "Parque lineal construido en 2009 sobre una vía de tren elevada de los años 30 que transportaba carne y productos lácteos a los mataderos del Meatpacking District. La vía dejó de funcionar en 1980 y durante 20 años quedó abandonada. En 1999 la ciudad quería demolerla. Dos vecinos sin experiencia en urbanismo, Joshua David y Robert Hammond, lanzaron una campaña para salvarla que tardó diez años en triunfar. El High Line se convirtió en el proyecto urbanístico más influyente de principios del siglo XXI — hoy existen imitaciones en ciudades de todo el mundo. Desde el parque se ven el río Hudson, los rascacielos de Hudson Yards y los muelles. Arte, instalaciones y plantas nativas. Tarda ~1h de punta a punta. Horario 7:00-19:00. Gratis.",
+        badge: "Gratis",
+        nearby: [{"n": "Cookshop (Chelsea)", "type": "🌿 Brunch americano", "note": "156 10th Ave. El brunch favorito de los neoyorquinos antes de pasear el High Line. Reservar en fin de semana."}, {"n": "Sullivan Street Bakery (Chelsea)", "type": "☕ Panadería italiana", "note": "236 9th Ave. Panadería italiana con el mejor pan focaccia de NYC y café de calidad."}]
+      },
+      { n: "Vessel + Edge NYC · Hudson Yards", lat: 40.7538, lng: -74.0022, icon: "🐚",
+        info: "Hudson Yards es el mayor desarrollo inmobiliario privado de la historia de América: 28 hectáreas sobre las cocheras de Penn Station, construidas literalmente sobre plataformas de hormigón que flotan sobre las vías activas del tren. Costó 25.000 millones de dólares y tardó 10 años. El barrio inauguró en 2019 y todavía está creciendo. El Vessel es una escultura de 154 escaleras interconectadas de 16 pisos de altura diseñada por Thomas Heatherwick — tomó como inspiración los pozos indios escalonados de Rajastán. Tiene 2.500 escalones y 80 rellanos. Puedes subirlo entero gratuitamente (hay que reservar online con antelación). Subir al Vessel te da una vista del barrio nuevo de Manhattan desde dentro de la propia arquitectura. El Edge (~$38) es el mirador con suelo de cristal inclinado 3 grados hacia el exterior a 335 metros de altura — la sensación de inclinarte sobre el vacío mirando Manhattan desde arriba está garantizada.",
+        badge: null,
+        nearby: [{"n": "Mercado Little Spain (José Andrés)", "type": "🇪🇸 Mercado español", "note": "10 Hudson Yards. El mercado español del chef José Andrés. Jamón, tapas, paella, churros — un trocito de España en Manhattan."}, {"n": "Magnolia Bakery (Hudson Yards)", "type": "🧁 Cupcakes & banana pudding", "note": "20 Hudson Yards, piso 4. La Magnolia Bakery del Sex and the City. Su banana pudding es el más famoso de NYC."}]
+      },
+      { n: "Intrepid Sea, Air & Space Museum", lat: 40.7648, lng: -74.0012, icon: "✈️",
+        info: "El portaaviones USS Intrepid anclado en el Pier 86 es uno de los museos más singulares de Nueva York. El Intrepid sobrevivió a cinco ataques kamikazes en el Pacífico durante la Segunda Guerra Mundial, fue buque de recuperación de astronautas del programa Mercury y Gemini (recogió las cápsulas de Alan Shepard y Scott Carpenter del océano), y sirvió como barco de espionaje durante la Guerra Fría. En su cubierta hay aviones militares originales: un Concorde de British Airways (uno de los 14 que volaron), el transbordador espacial Enterprise de la NASA, un SR-71 Blackbird (el avión más rápido de la historia, Mach 3,2), y el submarino de la Segunda Guerra Mundial Growler. Todo original. Entrada ~$36.",
+        badge: "~$36" },
+    ]
+  },
+]
+
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+const CATS = [
+  {id:"food",label:"Comida",icon:"🍽"},
+  {id:"drinks",label:"Cafés",icon:"☕"},
+  {id:"transport",label:"Transporte",icon:"🚇"},
+  {id:"entry",label:"Entradas",icon:"🎟"},
+  {id:"shopping",label:"Compras",icon:"🛍"},
+  {id:"other",label:"Otros",icon:"💳"},
+];
+
+let activeDay = 0;
+let activeTab = 'itinerary';
+let openPlace = -1;
+let ctxOpen = true;
+let customPlaces = JSON.parse(localStorage.getItem('customPlaces')||'[]');
+let expenses = JSON.parse(localStorage.getItem('expenses')||'{}');
+let editingPlace = null;
+let editingExp = null;
+let expCat = 'food';
+let maps = {};
+
+// ── PERSIST ────────────────────────────────────────────────────────────────
+function save(){
+  localStorage.setItem('customPlaces', JSON.stringify(customPlaces));
+  localStorage.setItem('expenses', JSON.stringify(expenses));
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+function init(){
+  buildNavPills();
+  buildCatPills();
+  buildAddDaySelect();
+  renderDay();
+  loadLeaflet();
+}
+
+function buildNavPills(){
+  const nyc = document.getElementById('nycPills');
+  const dc  = document.getElementById('dcPills');
+  DAYS.forEach(function(d){
+    const btn = document.createElement('button');
+    const dayId = d.id; // capture explicitly
+    btn.className = 'day-pill' + (dayId===activeDay?' active':'');
+    const dayAllPlaces = d.places.concat(customPlaces.filter(cp=>cp.dayId===d.id));
+    const dayVisited = dayAllPlaces.filter((p,pi)=>{
+      const pidx = pi < d.places.length ? pi : 'c'+customPlaces.filter(cp=>cp.dayId===d.id)[pi-d.places.length].id;
+      return isVisited(pidx, d.id);
+    }).length;
+    const dayTotal = dayAllPlaces.length;
+    btn.textContent = dayVisited > 0 
+      ? d.label + ' · ' + dayVisited + '/' + dayTotal
+      : d.label;
+    btn.dataset.dayId = String(dayId);
+    if(dayId===activeDay){ btn.style.background = d.color; btn.style.color='#fff'; }
+    btn.addEventListener('click', function(){
+      activeDay = parseInt(this.dataset.dayId);
+      openPlace = -1; activeTab = 'itinerary'; ctxOpen = true;
+      renderDay(); updateNavPills();
+    });
+    (d.city==='NYC'?nyc:dc).appendChild(btn);
+  });
+}
+
+function updateNavPills(){
+  document.querySelectorAll('.day-pill').forEach((btn)=>{
+    const dayId = parseInt(btn.dataset.dayId);
+    const d = DAYS.find(x=>x.id===dayId);
+    const active = d && d.id===activeDay;
+    btn.classList.toggle('active',active);
+    btn.style.background = active ? d.color : '';
+    btn.style.color = active ? '#fff' : '';
+  });
+}
+
+function buildAddDaySelect(){
+  const sel = document.getElementById('addDay');
+  DAYS.forEach(d=>{
+    const opt=document.createElement('option');
+    opt.value=d.id; opt.textContent=d.label+' – '+d.name;
+    sel.appendChild(opt);
+  });
+}
+
+function buildCatPills(){
+  renderCatPills('catPills', activeDay);
+}
+
+function renderCatPills(containerId, dayId){
+  const c = document.getElementById(containerId);
+  if(!c) return;
+  c.innerHTML = '';
+  const d = DAYS.find(x=>x.id===dayId);
+  CATS.forEach(cat=>{
+    const btn=document.createElement('button');
+    btn.className='cat-pill';
+    btn.textContent=cat.icon+' '+cat.label;
+    applyPillStyle(btn, cat.id===expCat, d);
+    btn.addEventListener('click', (function(catId){
+      return function(){
+        expCat = catId;
+        c.querySelectorAll('.cat-pill').forEach(function(b,i){
+          applyPillStyle(b, CATS[i].id===expCat, d);
+        });
+      };
+    })(cat.id));
+    c.appendChild(btn);
+  });
+}
+
+function applyPillStyle(btn, active, day){
+  if(active && day){
+    btn.style.cssText = 'background:'+day.color+';border-color:'+day.color+';color:#fff;padding:8px 12px;border-radius:20px;border:1.5px solid;font-size:12px;cursor:pointer;font-family:inherit;display:inline-block;-webkit-appearance:none;outline:none';
+  } else {
+    btn.style.cssText = 'background:#f5f5f5;border-color:#e0e0e0;color:#555;padding:8px 12px;border-radius:20px;border:1.5px solid #e0e0e0;font-size:12px;cursor:pointer;font-family:inherit;display:inline-block;-webkit-appearance:none;outline:none';
+  }
+}
+
+// ── RENDER ─────────────────────────────────────────────────────────────────
+function renderDay(){
+  const day = DAYS.find(d=>d.id===activeDay);
+  const ctx = DAY_CONTEXT[activeDay];
+  document.documentElement.style.setProperty('--day-color', day.color);
+  
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+
+  // Day header
+  const dh = document.createElement('div');
+  dh.className='day-header';
+  dh.style.cssText=`background:${day.bg};border:1px solid ${day.color}33;`;
+  dh.innerHTML=`
+    <div class="day-num" style="background:${day.color}">${day.id}</div>
+    <div>
+      <div class="day-name" style="color:${day.textColor}">${day.name}</div>
+      <div class="day-date" style="color:${day.textColor}">${day.date} · ${day.via}</div>
+    </div>
+    <div class="city-tag" style="background:${day.city==='DC'?'#3D1F5A22':'#0C447C22'};color:${day.city==='DC'?'#6B3D8A':'#378ADD'}">
+      ${day.city==='DC'?'🏛 Washington D.C.':'🗽 Nueva York'}
+    </div>`;
+  app.appendChild(dh);
+
+  // Progress bar
+  const allPlaces = day.places.concat(customPlaces.filter(cp=>cp.dayId===activeDay));
+  const totalPlaces = allPlaces.length;
+  const visitedCount = allPlaces.filter((p,i)=>{
+    const idx = i < day.places.length ? i : 'c'+customPlaces.filter(cp=>cp.dayId===activeDay)[i-day.places.length].id;
+    return isVisited(idx, activeDay);
+  }).length;
+  
+  if(totalPlaces > 0){
+    const pct = Math.round(visitedCount/totalPlaces*100);
+    const progWrap = document.createElement('div');
+    progWrap.className = 'progress-bar-wrap';
+    const progFill = document.createElement('div');
+    progFill.className = 'progress-bar-fill';
+    progFill.style.cssText = `width:${pct}%;background:${day.color}`;
+    progWrap.appendChild(progFill);
+    app.appendChild(progWrap);
+    
+    const progLabel = document.createElement('div');
+    progLabel.className = 'progress-label';
+    progLabel.style.color = visitedCount === totalPlaces ? '#22c55e' : '#888';
+    progLabel.textContent = visitedCount === totalPlaces
+      ? `✅ Día completado — ${totalPlaces} lugares visitados`
+      : `${visitedCount} de ${totalPlaces} lugares visitados`;
+    app.appendChild(progLabel);
+  }
+
+  // Tabs
+  const tabBar = document.createElement('div');
+  tabBar.className='tabs';
+  [['itinerary','📋 Itinerario'],['expenses','💰 Gastos'],['map','🗺 Mapa día'],['mapall','🌍 Total']].forEach(([id,label])=>{
+    const t=document.createElement('button');
+    t.className='tab'+(activeTab===id?' active':'');
+    t.textContent=label;
+    t.onclick=()=>{ activeTab=id; renderDay(); };
+    tabBar.appendChild(t);
+  });
+  app.appendChild(tabBar);
+
+  if(activeTab==='itinerary') renderItinerary(app, day, ctx);
+  else if(activeTab==='expenses') renderExpenses(app, day);
+  else if(activeTab==='map') renderMap(app, day, false);
+  else if(activeTab==='mapall') renderMap(app, day, true);
+}
+
+// ── ITINERARY ──────────────────────────────────────────────────────────────
+function renderItinerary(app, day, ctx){
+  // Context block
+  if(ctx){
+    const cb=document.createElement('div');
+    cb.className='ctx-block';
+    cb.style.cssText=`background:${day.bg};border:1px solid ${day.color}44;`;
+    cb.innerHTML=`
+      <div class="ctx-head" onclick="ctxOpen=!ctxOpen;renderDay()">
+        <span>🗺</span>
+        <span class="title" style="color:${day.textColor}">${ctx.title}</span>
+        <span class="toggle" style="color:${day.color}">${ctxOpen?'▲ Ocultar':'▼ Leer'}</span>
+      </div>
+      ${ctxOpen?`<div class="ctx-body" style="border-color:${day.color}22"><p style="color:${day.textColor}">${ctx.text}</p></div>`:''}`;
+    app.appendChild(cb);
+  }
+
+  const places = document.createElement('div');
+  places.className='places';
+
+  // Built-in places
+  day.places.forEach((p,i)=>{
+    places.appendChild(makePlaceCard(p, i, day, false));
+  });
+
+  // Custom places
+  customPlaces.filter(cp=>cp.dayId===activeDay).forEach(cp=>{
+    places.appendChild(makePlaceCard(cp, 'c'+cp.id, day, true));
+  });
+
+  // Add button
+  const addBtn=document.createElement('button');
+  addBtn.className='add-place-btn';
+  addBtn.style.cssText=`border-color:${day.color}88;color:${day.textColor}`;
+  addBtn.innerHTML='<span style="font-size:18px">+</span> Añadir sitio a este día';
+  addBtn.onclick=()=>openAddModal(activeDay);
+  places.appendChild(addBtn);
+  app.appendChild(places);
+}
+
+
+function nearbyBadges(nearby){
+  // Extract the first emoji from each item's type field
+  const counts = {};
+  nearby.forEach(nb => {
+    const emoji = (nb.type.match(/^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/u) || nb.type.match(/^(\S+)/)||['?'])[0];
+    counts[emoji] = (counts[emoji]||0) + 1;
+  });
+  return Object.entries(counts)
+    .map(([em,n]) => `<span style="background:#fff8e1;color:#8b6200;border:1px solid #f0c04044;font-size:10px;padding:2px 6px;border-radius:8px;font-weight:500;white-space:nowrap">${em} ${n}</span>`)
+    .join('');
+}
+
+function getNearbyCategory(type){
+  const t = type || '';
+  const first = t.trim().charAt(0);
+  // Map leading emoji to broad category
+  const food = ['🍽','🍳','🥩','🥗','🍜','🍝','🌮','🥙','🌯','🥪','🍔','🍕','🥐','🍱','🦪','🦞','🥟','🍺','🍷','🥂','☕','🫖','🧁','🍮','🍦','🍪','🛶','🌾','🌽','🥬','🥯'];
+  const shop = ['🛍','🛒','📚','🏗','🚒','⛴','🪨','🌳','🏚','🏙'];
+  if(food.includes(first)) return {emoji: first, cat: 'food'};
+  if(shop.includes(first)) return {emoji: first, cat: 'shop'};
+  return {emoji: first||'📍', cat: 'other'};
+}
+
+function getNearbyBadges(nearby){
+  if(!nearby||!nearby.length) return '';
+  // Count by leading emoji
+  const counts = {};
+  nearby.forEach(nb=>{
+    const {emoji} = getNearbyCategory(nb.type);
+    counts[emoji] = (counts[emoji]||0)+1;
+  });
+  return Object.entries(counts).map(([emoji, count])=>
+    `<span style="background:#fff8e1;color:#8b6200;border:1px solid #f0c04044;font-size:10px;padding:2px 6px;border-radius:8px;font-weight:500;margin-right:2px">${emoji} ${count}</span>`
+  ).join('');
+}
+
+function makePlaceCard(p, idx, day, isCustom){
+  const isOpen = String(openPlace) === String(idx);
+  const hasNearby = p.nearby && p.nearby.length > 0;
+  const visitedNow = isVisited(idx, activeDay);
+
+  const card = document.createElement('div');
+  card.style.cssText = `
+    border-radius:11px;
+    border:${isOpen ? '1.5px solid '+day.color : '1px solid #e8e8e8'};
+    background:${isOpen ? day.bg : '#ffffff'};
+    overflow:hidden;
+    transition:border-color .15s, background .15s;
+    margin-bottom:0;
+    ${isCustom ? 'border-style:dashed;' : ''}
+  `.replace(/\s+/g,' ');
+
+  // ── HEAD ──────────────────────────────────────────────────────────────
+  const head = document.createElement('div');
+  head.style.cssText = 'padding:11px 13px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none';
+
+  // Checkbox
+  const checkbox = document.createElement('div');
+  checkbox.style.cssText = 'width:24px;height:24px;border-radius:50%;border:2px solid ' + (visitedNow ? '#22c55e' : '#ddd') + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;font-size:13px;font-weight:700;background:' + (visitedNow ? '#22c55e' : '#fff') + ';color:#fff;transition:all .2s';
+  checkbox.textContent = visitedNow ? '✓' : '';
+  checkbox.addEventListener('click', function(e){
+    e.stopPropagation();
+    toggleVisited(idx, activeDay);
+  });
+  head.appendChild(checkbox);
+
+  // Icon box
+  const iconBox = document.createElement('div');
+  iconBox.style.cssText = `width:34px;height:34px;border-radius:8px;flex-shrink:0;background:${day.bg};display:flex;align-items:center;justify-content:center;font-size:17px;border:1px solid ${day.color}44;${visitedNow ? 'opacity:0.45' : ''}`;
+  iconBox.textContent = p.icon || '⭐';
+  head.appendChild(iconBox);
+
+  // Text column
+  const textCol = document.createElement('div');
+  textCol.style.cssText = 'flex:1;min-width:0';
+
+  const title = document.createElement('div');
+  title.style.cssText = `font-size:14px;font-weight:500;color:${visitedNow ? '#aaa' : (isOpen ? day.textColor : '#111111')};${visitedNow?'text-decoration:line-through':''}`;
+  title.textContent = p.n;
+  textCol.appendChild(title);
+
+  // Badges row
+  const badges = document.createElement('div');
+  badges.style.cssText = 'display:flex;gap:5px;flex-wrap:wrap;margin-top:3px;align-items:center';
+  if(p.badge){
+    const b = document.createElement('span');
+    b.style.cssText = `font-size:10px;padding:2px 7px;border-radius:8px;font-weight:500;background:${day.bg};color:${day.textColor};border:1px solid ${day.color}55`;
+    b.textContent = p.badge;
+    badges.appendChild(b);
+  }
+  if(hasNearby){
+    const b = document.createElement('span');
+    b.style.cssText = 'background:#fff8e1;color:#8b6200;border:1px solid #f0c04044;font-size:10px;padding:2px 7px;border-radius:8px;font-weight:500';
+    b.innerHTML = nearbyBadges(p.nearby);
+    b.style.cssText = 'display:flex;gap:4px;align-items:center';
+    badges.appendChild(b);
+  }
+  if(isCustom){
+    const b = document.createElement('span');
+    b.style.cssText = 'background:#f0f9ff;color:#0369a1;border:1px solid #bae6fd;font-size:10px;padding:2px 7px;border-radius:8px;font-weight:500';
+    b.textContent = 'Añadido';
+    badges.appendChild(b);
+  }
+  textCol.appendChild(badges);
+
+  if(!isOpen){
+    const hint = document.createElement('div');
+    hint.style.cssText = 'font-size:11px;color:#999;margin-top:2px';
+    hint.textContent = 'Toca para ver detalles';
+    textCol.appendChild(hint);
+  }
+  head.appendChild(textCol);
+
+  // Right side: edit + chevron in a wrapper
+  const rightWrap = document.createElement('div');
+  rightWrap.style.cssText = 'display:flex;align-items:center;gap:4px;flex-shrink:0;margin-left:6px';
+
+  const editIcon = document.createElement('button');
+  editIcon.style.cssText = 'background:#f0f0f0;border:none;cursor:pointer;font-size:13px;padding:5px 7px;border-radius:7px;flex-shrink:0;line-height:1;display:flex;align-items:center;justify-content:center';
+  editIcon.textContent = '✏';
+  editIcon.title = 'Editar';
+  editIcon.addEventListener('click', function(e){
+    e.stopPropagation();
+    openEditPlaceModal(p, idx, day);
+  });
+  rightWrap.appendChild(editIcon);
+
+  const chev = document.createElement('div');
+  chev.style.cssText = `font-size:12px;flex-shrink:0;color:${isOpen ? day.color : '#bbb'};font-weight:600;padding:0 2px`;
+  chev.textContent = isOpen ? '▲' : '▼';
+  rightWrap.appendChild(chev);
+
+  head.appendChild(rightWrap);
+
+  head.addEventListener('click', function(){
+    openPlace = isOpen ? -1 : idx;
+    renderDay();
+  });
+  card.appendChild(head);
+
+  // ── DETAIL (open state) ───────────────────────────────────────────────
+  if(isOpen){
+    const detail = document.createElement('div');
+    detail.style.cssText = `padding:0 13px 14px;border-top:1px solid ${day.color}33;background:${day.bg}`;
+
+    const infoText = document.createElement('p');
+    infoText.style.cssText = `font-size:13px;color:${day.textColor};line-height:1.68;margin-top:10px;opacity:0.9`;
+    infoText.textContent = p.info || '';
+    detail.appendChild(infoText);
+
+    // ── Documents section ────────────────────────────────────────────
+    const placeKey = getPlaceKey(idx, activeDay);
+    const placeDocs = getPlaceDocs(idx, activeDay);
+    
+    const docSection = document.createElement('div');
+    docSection.style.cssText = 'margin-top:12px;padding-top:10px;border-top:1px solid ' + day.color + '22';
+    
+    const docHeader = document.createElement('div');
+    docHeader.style.cssText = 'display:flex;align-items:center;justify-content:space-between';
+    
+    if(placeDocs.length > 0){
+      const docLabel = document.createElement('div');
+      docLabel.style.cssText = 'font-size:11px;font-weight:700;color:' + day.textColor + ';display:flex;align-items:center;gap:5px';
+      docLabel.innerHTML = '📎 Documentos (' + placeDocs.length + ')';
+      docHeader.appendChild(docLabel);
+    }
+    
+    const addDocBtn = document.createElement('button');
+    addDocBtn.className = 'doc-btn' + (placeDocs.length > 0 ? '' : '');
+    addDocBtn.innerHTML = '📎 ' + (placeDocs.length > 0 ? 'Añadir otro' : 'Adjuntar PDF / imagen');
+    addDocBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      triggerDocUpload(idx, activeDay);
+    });
+    docHeader.appendChild(addDocBtn);
+    docSection.appendChild(docHeader);
+    
+    if(placeDocs.length > 0){
+      const docList = document.createElement('div');
+      docList.className = 'doc-list';
+      placeDocs.forEach(function(doc){
+        const item = document.createElement('div');
+        item.className = 'doc-item';
+        
+        const icon = doc.type === 'application/pdf' ? '📄' : '🖼';
+        const nameEl = document.createElement('span');
+        nameEl.className = 'doc-item-name';
+        nameEl.textContent = icon + ' ' + doc.name;
+        
+        const openBtn = document.createElement('button');
+        openBtn.className = 'doc-item-open';
+        openBtn.textContent = 'Ver';
+        openBtn.addEventListener('click', function(e){
+          e.stopPropagation();
+          openDocViewer(doc);
+        });
+        
+        const delBtn = document.createElement('button');
+        delBtn.className = 'doc-item-del';
+        delBtn.textContent = '✕';
+        delBtn.addEventListener('click', function(e){
+          e.stopPropagation();
+          if(confirm('¿Eliminar "' + doc.name + '"?')) deleteDoc(placeKey, doc.id);
+        });
+        
+        item.appendChild(nameEl);
+        item.appendChild(openBtn);
+        item.appendChild(delBtn);
+        docList.appendChild(item);
+      });
+      docSection.appendChild(docList);
+    }
+    
+    detail.appendChild(docSection);
+
+    if(hasNearby){
+      const ns = document.createElement('div');
+      ns.style.cssText = `margin-top:12px;padding-top:10px;border-top:1px solid ${day.color}22`;
+
+      const nsLabel = document.createElement('div');
+      nsLabel.style.cssText = `font-size:11px;font-weight:700;color:${day.textColor};margin-bottom:8px;display:flex;align-items:center;gap:5px`;
+      nsLabel.innerHTML = '🍽 Cerca para comer / tomar algo';
+      ns.appendChild(nsLabel);
+
+      p.nearby.forEach(nb => {
+        const item = document.createElement('div');
+        item.style.cssText = `background:rgba(255,255,255,0.7);border-radius:8px;padding:8px 10px;margin-bottom:5px;border:1px solid ${day.color}33`;
+        const itemHead = document.createElement('div');
+        itemHead.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px';
+        const nbName = document.createElement('span');
+        nbName.style.cssText = `font-size:11px;font-weight:600;color:${day.textColor}`;
+        nbName.textContent = nb.n;
+        const nbType = document.createElement('span');
+        nbType.style.cssText = `font-size:10px;padding:1px 6px;border-radius:6px;background:${day.bg};border:1px solid ${day.color}44;color:${day.textColor}`;
+        nbType.textContent = nb.type;
+        itemHead.appendChild(nbName);
+        itemHead.appendChild(nbType);
+        item.appendChild(itemHead);
+        const nbNote = document.createElement('div');
+        nbNote.style.cssText = `font-size:11px;color:${day.textColor};opacity:.8;line-height:1.5`;
+        nbNote.textContent = nb.note;
+        item.appendChild(nbNote);
+        ns.appendChild(item);
+      });
+      detail.appendChild(ns);
+    }
+
+    if(isCustom){
+      const actions = document.createElement('div');
+      actions.style.cssText = 'display:flex;gap:6px;margin-top:10px';
+      const editBtn = document.createElement('button');
+      editBtn.style.cssText = `font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid ${day.color}66;background:transparent;color:${day.textColor};cursor:pointer`;
+      editBtn.textContent = '✏ Editar';
+      editBtn.addEventListener('click', function(e){ e.stopPropagation(); editCustomPlace(p.id); });
+      const delBtn = document.createElement('button');
+      delBtn.style.cssText = 'font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid #fecaca;background:transparent;color:#e74c3c;cursor:pointer';
+      delBtn.textContent = '✕ Eliminar';
+      delBtn.addEventListener('click', function(e){ e.stopPropagation(); deleteCustomPlace(p.id); });
+      actions.appendChild(editBtn);
+      actions.appendChild(delBtn);
+      detail.appendChild(actions);
+    }
+
+    card.appendChild(detail);
+  }
+
+  return card;
+}
+
+// ── EXPENSES ───────────────────────────────────────────────────────────────
+function renderExpenses(app, day){
+  const dayExp = expenses[activeDay]||[];
+  const totalDay = dayExp.reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
+  const totalTrip = Object.values(expenses).flat().reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
+
+  // Summary cards
+  const summary=document.createElement('div');
+  summary.className='exp-summary';
+  summary.innerHTML=`
+    <div class="exp-card" style="background:${day.bg};border:1px solid ${day.color}33">
+      <div class="label" style="color:${day.textColor}">Total hoy</div>
+      <div class="amount" style="color:${day.textColor}">$${totalDay.toFixed(2)}</div>
+    </div>
+    <div class="exp-card" style="background:#f8f7f4;border:1px solid #e5e3de">
+      <div class="label" style="color:#999">Total viaje</div>
+      <div class="amount" style="color:#1a1a1a">$${totalTrip.toFixed(2)}</div>
+    </div>`;
+  app.appendChild(summary);
+
+  // By category
+  const activeCats = CATS.map(c=>({
+    ...c,
+    items: dayExp.filter(e=>e.cat===c.id),
+    total: dayExp.filter(e=>e.cat===c.id).reduce((s,e)=>s+(parseFloat(e.amount)||0),0)
+  })).filter(c=>c.items.length>0);
+
+  if(activeCats.length>0){
+    const cats=document.createElement('div');
+    cats.className='exp-cats';
+    activeCats.forEach(cat=>{
+      const cd=document.createElement('div');
+      cd.className='exp-cat';
+      cd.innerHTML=`<div class="exp-cat-head">
+        <span style="font-size:15px">${cat.icon}</span>
+        <span class="exp-cat-name">${cat.label}</span>
+        <span class="exp-cat-total" style="color:${day.color}">$${cat.total.toFixed(2)}</span>
+      </div>`;
+      cat.items.forEach(exp=>{
+        cd.innerHTML+=`<div class="exp-item">
+          <span class="exp-item-desc">${exp.desc}</span>
+          <span class="exp-item-amt">${exp.currency} ${parseFloat(exp.amount).toFixed(2)}</span>
+          <button class="btn-sm" onclick="editExp(${exp.id})" style="font-size:10px;padding:2px 6px">✏</button>
+          <button class="btn-sm delete" onclick="deleteExp(${exp.id})" style="font-size:10px;padding:2px 6px">✕</button>
+        </div>`;
+      });
+      cats.appendChild(cd);
+    });
+    app.appendChild(cats);
+  } else {
+    const empty=document.createElement('div');
+    empty.className='exp-empty';
+    empty.textContent='Aún no hay gastos para este día';
+    app.appendChild(empty);
+  }
+
+  const addBtn=document.createElement('button');
+  addBtn.className='add-exp-btn';
+  addBtn.style.cssText=`border-color:${day.color}88;color:${day.textColor}`;
+  addBtn.innerHTML='<span style="font-size:18px">+</span> Añadir gasto';
+  addBtn.onclick=()=>openExpModal();
+  app.appendChild(addBtn);
+}
+
+// ── MAP ────────────────────────────────────────────────────────────────────
+function loadLeaflet(){
+  if(window.L) return;
+  const css=document.createElement('link');
+  css.rel='stylesheet'; css.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+  document.head.appendChild(css);
+  const js=document.createElement('script');
+  js.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  js.onload=()=>{ if(activeTab==='map'||activeTab==='mapall') renderDay(); };
+  document.head.appendChild(js);
+}
+
+const TRAVEL_TIMES = [
+  {from:"Hotel",to:"Madison Square Garden",walk:25,note:"25 min por la 8th Ave"},
+  {from:"Madison Square Garden",to:"Empire State Building",walk:7,note:"7 min"},
+  {from:"Empire State Building",to:"Times Square",walk:11,note:"11 min por la 7th Ave"},
+];
+
+// Track user location marker globally
+let userLocMarker = null;
+let userLocCircle = null;
+
+function renderMap(app, day, all){
+  const cid = all?'map-all-container':'map-container';
+  const mc=document.createElement('div');
+  mc.id=cid; mc.style.cssText='margin:10px 12px 0;border-radius:12px;overflow:hidden;border:1px solid #e5e3de;height:min(420px,60vh);min-height:280px;position:relative';
+  app.appendChild(mc);
+
+  const legend=document.createElement('div');
+  legend.className='map-legend';
+  legend.innerHTML=`<div class="map-tip">💡 Toca una línea para ver el tiempo de trayecto</div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+      <div class="legend-dot" style="background:#E53935;width:12px;height:12px;border-radius:3px"></div>
+      <span>🏨 Hotel TownePlace Suites · 324 W 44th St</span>
+    </div>
+    <div class="legend-items">
+      ${(all?DAYS:[day]).map(d=>`<div style="display:flex;align-items:center;gap:5px">
+        <div class="legend-dot" style="background:${d.color}"></div>
+        <span>${d.label}: ${d.name}</span>
+      </div>`).join('')}
+    </div>`;
+  app.appendChild(legend);
+
+  if(!window.L){ mc.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#999;font-size:14px">Cargando mapa...</div>'; return; }
+
+  setTimeout(()=>{
+    const mapId = all?'all':day.id;
+    if(maps[mapId]){ maps[mapId].invalidateSize(); return; }
+    const daysToShow = all?DAYS:[day];
+    const allCoords = [];
+    daysToShow.forEach(d=>{ if(d.route) d.route.forEach(c=>allCoords.push(c)); });
+    allCoords.push([HOTEL.lat, HOTEL.lng]);
+    
+    const bounds = L.latLngBounds(allCoords);
+    const m = L.map(cid, {zoomControl:true, attributionControl:false}).fitBounds(bounds, {padding:[20,20]});
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(m);
+    maps[mapId] = m;
+
+    // ── Location button ────────────────────────────────────────────────
+    const locBtn = document.createElement('button');
+    locBtn.className = 'map-loc-btn';
+    locBtn.innerHTML = '📍 Mi ubicación';
+    locBtn.addEventListener('click', function(){
+      if(!navigator.geolocation){
+        alert('Tu navegador no soporta geolocalización.');
+        return;
+      }
+      locBtn.innerHTML = '⏳ Buscando...';
+      locBtn.disabled = true;
+      navigator.geolocation.getCurrentPosition(
+        function(pos){
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const acc = pos.coords.accuracy; // metres
+
+          // Remove previous markers
+          if(userLocMarker){ m.removeLayer(userLocMarker); }
+          if(userLocCircle){ m.removeLayer(userLocCircle); }
+
+          // Accuracy circle
+          userLocCircle = L.circle([lat,lng], {
+            radius: acc,
+            color: '#1a73e8',
+            fillColor: '#1a73e8',
+            fillOpacity: 0.12,
+            weight: 1.5
+          }).addTo(m);
+
+          // Position dot
+          userLocMarker = L.circleMarker([lat,lng], {
+            radius: 8,
+            color: '#fff',
+            fillColor: '#1a73e8',
+            fillOpacity: 1,
+            weight: 3
+          }).addTo(m).bindPopup('📍 Estás aquí<br><small>Precisión: ~' + Math.round(acc) + 'm</small>').openPopup();
+
+          m.setView([lat,lng], 16);
+          locBtn.innerHTML = '📍 Mi ubicación';
+          locBtn.disabled = false;
+        },
+        function(err){
+          const msgs = {1:'Permiso denegado. Activa la ubicación en los ajustes del navegador.', 2:'No se pudo obtener la ubicación.', 3:'Tiempo de espera agotado.'};
+          alert(msgs[err.code] || 'Error de geolocalización.');
+          locBtn.innerHTML = '📍 Mi ubicación';
+          locBtn.disabled = false;
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+      );
+    });
+    document.getElementById(cid).appendChild(locBtn);
+
+    // Hotel marker
+    L.marker([HOTEL.lat,HOTEL.lng],{icon:L.divIcon({className:'',html:'<div style="background:#E53935;color:white;border-radius:4px;padding:2px 6px;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.4);border:1.5px solid white">🏨 Hotel</div>',iconAnchor:[0,0]})}).addTo(m);
+
+    daysToShow.forEach(d=>{
+      if(!d.route||d.route.length<2) return;
+      const pl = L.polyline(d.route,{color:d.color,weight:3.5,opacity:.85}).addTo(m);
+      pl.bindPopup(`<b>${d.label}</b> ${d.name}<br><small>${d.via}</small>`);
+      d.places.forEach(p=>{
+        if(p.lat&&p.lng){
+          L.circleMarker([p.lat,p.lng],{radius:6,color:d.color,fillColor:d.color,fillOpacity:.9,weight:2}).addTo(m)
+           .bindPopup(`<b>${p.icon||''} ${p.n}</b>${p.badge?'<br><small>'+p.badge+'</small>':''}`);
+        }
+      });
+      customPlaces.filter(cp=>cp.dayId===d.id&&cp.lat&&cp.lng).forEach(cp=>{
+        L.circleMarker([cp.lat,cp.lng],{radius:6,color:d.color,fillColor:'#fff',fillOpacity:1,weight:2,dashArray:'4'}).addTo(m)
+         .bindPopup(`<b>${cp.n}</b><br><small>Añadido</small>`);
+      });
+    });
+  }, 50);
+}
+
+// ── ADD PLACE MODAL ────────────────────────────────────────────────────────
+function openAddModal(dayId){
+  editingPlace=null;
+  document.getElementById('addModalTitle').textContent='Añadir sitio';
+  document.getElementById('addDay').value=dayId||activeDay;
+  document.getElementById('addIcon').value='⭐';
+  document.getElementById('addName').value='';
+  document.getElementById('addInfo').value='';
+  document.getElementById('addBadge').value='';
+  document.getElementById('addLat').value='';
+  document.getElementById('addLng').value='';
+  const d=DAYS.find(x=>x.id===(dayId||activeDay));
+  document.getElementById('addSaveBtn').style.background=d?d.color:'#378ADD';
+  document.getElementById('addModal').style.display='flex';
+}
+
+function editCustomPlace(id){
+  const cp=customPlaces.find(p=>p.id===id);
+  if(!cp) return;
+  editingPlace=id;
+  document.getElementById('addModalTitle').textContent='Editar sitio';
+  document.getElementById('addDay').value=cp.dayId;
+  document.getElementById('addIcon').value=cp.icon||'⭐';
+  document.getElementById('addName').value=cp.n;
+  document.getElementById('addInfo').value=cp.info||'';
+  document.getElementById('addBadge').value=cp.badge||'';
+  document.getElementById('addLat').value=cp.lat||'';
+  document.getElementById('addLng').value=cp.lng||'';
+  const d=DAYS.find(x=>x.id===cp.dayId);
+  document.getElementById('addSaveBtn').style.background=d?d.color:'#378ADD';
+  document.getElementById('addModal').style.display='flex';
+}
+
+function closeAddModal(){ document.getElementById('addModal').style.display='none'; editingPlace=null; }
+
+function savePlace(){
+  const n=document.getElementById('addName').value.trim();
+  if(!n) return;
+  const dayId=parseInt(document.getElementById('addDay').value);
+  const lat=parseFloat(document.getElementById('addLat').value);
+  const lng=parseFloat(document.getElementById('addLng').value);
+  const place={id:editingPlace||Date.now(),dayId,n,icon:document.getElementById('addIcon').value||'⭐',info:document.getElementById('addInfo').value,badge:document.getElementById('addBadge').value,lat:isNaN(lat)?null:lat,lng:isNaN(lng)?null:lng,nearby:[]};
+  if(editingPlace) customPlaces=customPlaces.map(p=>p.id===editingPlace?place:p);
+  else customPlaces.push(place);
+  save(); closeAddModal(); renderDay();
+}
+
+function deleteCustomPlace(id){ customPlaces=customPlaces.filter(p=>p.id!==id); save(); openPlace=-1; renderDay(); }
+
+// ── EXPENSE MODAL ──────────────────────────────────────────────────────────
+function openExpModal(exp){
+  editingExp = exp||null;
+  document.getElementById('expModalTitle').textContent = exp?'Editar gasto':'Añadir gasto';
+  document.getElementById('expDesc').value = exp?exp.desc:'';
+  document.getElementById('expAmount').value = exp?exp.amount:'';
+  document.getElementById('expCurrency').value = exp?exp.currency:'USD';
+  expCat = exp?exp.cat:'food';
+  renderCatPills('catPills', activeDay);
+  const d=DAYS.find(x=>x.id===activeDay);
+  document.getElementById('expSaveBtn').style.background=d?d.color:'#378ADD';
+  document.getElementById('expModal').style.display='flex';
+}
+
+function editExp(id){
+  const dayExp=expenses[activeDay]||[];
+  const exp=dayExp.find(e=>e.id===id);
+  if(exp) openExpModal(exp);
+}
+
+function closeExpModal(){ document.getElementById('expModal').style.display='none'; editingExp=null; }
+
+function saveExpense(){
+  const desc=document.getElementById('expDesc').value.trim();
+  const amount=parseFloat(document.getElementById('expAmount').value);
+  if(!desc||isNaN(amount)) return;
+  const exp={id:editingExp?editingExp.id:Date.now(),desc,amount,cat:expCat,currency:document.getElementById('expCurrency').value};
+  if(!expenses[activeDay]) expenses[activeDay]=[];
+  if(editingExp) expenses[activeDay]=expenses[activeDay].map(e=>e.id===editingExp.id?exp:e);
+  else expenses[activeDay].push(exp);
+  save(); closeExpModal(); renderDay();
+}
+
+function deleteExp(id){ if(expenses[activeDay]) expenses[activeDay]=expenses[activeDay].filter(e=>e.id!==id); save(); renderDay(); }
+
+
+// togglePlace replaced by addEventListener in makePlaceCard
+
+
+
+// ── DOCUMENTS ────────────────────────────────────────────────────────────
+let docs = {};
+try { docs = JSON.parse(localStorage.getItem('placeDocs')||'{}'); } catch(e){}
+
+// visited: { "d{dayId}_{idx}": true }
+let visited = {};
+try { visited = JSON.parse(localStorage.getItem('visited')||'{}'); } catch(e){}
+
+function saveVisited(){
+  localStorage.setItem('visited', JSON.stringify(visited));
+}
+
+function getVisitedKey(idx, dayId){
+  return 'd' + dayId + '_' + String(idx);
+}
+
+function isVisited(idx, dayId){
+  return !!visited[getVisitedKey(idx, dayId)];
+}
+
+function toggleVisited(idx, dayId){
+  const k = getVisitedKey(idx, dayId);
+  if(visited[k]) delete visited[k];
+  else visited[k] = true;
+  saveVisited();
+  renderDay();
+}
+
+function saveDocs(){
+  try { localStorage.setItem('placeDocs', JSON.stringify(docs)); }
+  catch(e){ alert('Almacenamiento lleno. Intenta eliminar algunos documentos.'); }
+}
+
+function getPlaceKey(idx, dayId){
+  return 'p_' + dayId + '_' + String(idx).replace('c','C');
+}
+
+function getPlaceDocs(idx, dayId){
+  return docs[getPlaceKey(idx, dayId)] || [];
+}
+
+function addDocToPlace(idx, dayId, file){
+  const key = getPlaceKey(idx, dayId);
+  const reader = new FileReader();
+  reader.onload = function(e){
+    if(!docs[key]) docs[key] = [];
+    docs[key].push({
+      id: Date.now(),
+      name: file.name,
+      type: file.type,
+      dataUrl: e.target.result
+    });
+    saveDocs();
+    renderDay();
+  };
+  reader.readAsDataURL(file);
+}
+
+function deleteDoc(placeKey, docId){
+  if(!docs[placeKey]) return;
+  docs[placeKey] = docs[placeKey].filter(d=>d.id!==docId);
+  if(docs[placeKey].length===0) delete docs[placeKey];
+  saveDocs();
+  renderDay();
+}
+
+function openDocViewer(doc){
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;z-index:10000;padding:0';
+  
+  const box = document.createElement('div');
+  box.className = 'doc-modal-box';
+  
+  const header = document.createElement('div');
+  header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:14px';
+  header.innerHTML = `<span style="font-size:14px;font-weight:600;color:#111;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:260px">${doc.name}</span>`;
+  
+  const closeBtn = document.createElement('button');
+  closeBtn.style.cssText = 'background:#f0f0f0;border:none;border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;font-weight:500;flex-shrink:0';
+  closeBtn.textContent = '✕ Cerrar';
+  closeBtn.onclick = ()=> overlay.remove();
+  header.appendChild(closeBtn);
+  box.appendChild(header);
+  
+  if(doc.type === 'application/pdf'){
+    const iframe = document.createElement('iframe');
+    iframe.className = 'doc-preview';
+    iframe.src = doc.dataUrl;
+    box.appendChild(iframe);
+  } else {
+    const img = document.createElement('img');
+    img.style.cssText = 'width:100%;border-radius:10px;display:block';
+    img.src = doc.dataUrl;
+    box.appendChild(img);
+  }
+  
+  // Also offer download
+  const dlBtn = document.createElement('a');
+  dlBtn.href = doc.dataUrl;
+  dlBtn.download = doc.name;
+  dlBtn.style.cssText = 'display:block;text-align:center;margin-top:12px;font-size:13px;color:#378ADD;font-weight:500;text-decoration:none';
+  dlBtn.textContent = '⬇ Descargar';
+  box.appendChild(dlBtn);
+  
+  overlay.appendChild(box);
+  overlay.addEventListener('click', e=>{ if(e.target===overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+function triggerDocUpload(idx, dayId){
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/pdf,image/*';
+  input.onchange = function(){
+    if(input.files[0]) addDocToPlace(idx, dayId, input.files[0]);
+  };
+  input.click();
+}
+
+// ── EDIT PLACE MODAL ────────────────────────────────────────────────────
+// editTarget: { place, idx, day, isCustom }
+let editTarget = null;
+
+function openEditPlaceModal(p, idx, day){
+  editTarget = { p, idx, day, isCustom: typeof idx === 'string' && idx.startsWith('c') };
+  document.getElementById('editPlaceName').value = p.n || '';
+  document.getElementById('editPlaceIcon').value = p.icon || '⭐';
+  document.getElementById('editPlaceInfo').value = p.info || '';
+  document.getElementById('editPlaceBadge').value = p.badge || '';
+  document.getElementById('editPlaceLat').value = p.lat || '';
+  document.getElementById('editPlaceLng').value = p.lng || '';
+  const d2 = DAYS.find(x=>x.id===activeDay);
+  const saveBtn = document.getElementById('editSaveBtn');
+  if(saveBtn && d2) saveBtn.style.background = d2.color;
+  document.getElementById('editPlaceModal').style.display = 'flex';
+}
+
+function closeEditPlaceModal(){
+  document.getElementById('editPlaceModal').style.display = 'none';
+  editTarget = null;
+}
+
+function saveEditPlace(){
+  if(!editTarget) return;
+  const {p, idx, day, isCustom} = editTarget;
+  const newName = document.getElementById('editPlaceName').value.trim();
+  if(!newName) return;
+  
+  p.n     = newName;
+  p.icon  = document.getElementById('editPlaceIcon').value || '⭐';
+  p.info  = document.getElementById('editPlaceInfo').value;
+  p.badge = document.getElementById('editPlaceBadge').value || null;
+  const lat = parseFloat(document.getElementById('editPlaceLat').value);
+  const lng = parseFloat(document.getElementById('editPlaceLng').value);
+  p.lat = isNaN(lat) ? (p.lat||null) : lat;
+  p.lng = isNaN(lng) ? (p.lng||null) : lng;
+
+  if(isCustom){
+    // custom place — update in customPlaces array
+    const id = parseInt(idx.replace('c',''));
+    customPlaces = customPlaces.map(cp => cp.id===id ? {...cp, ...p} : cp);
+    save();
+  }
+  // For built-in places, p is the object reference — mutation is direct
+  closeEditPlaceModal();
+  renderDay();
+}
+
+// ── START ──────────────────────────────────────────────────────────────────
+init();
+</script>
+
+<!-- MODAL: Edit Place -->
+<div class="modal-overlay" id="editPlaceModal" style="display:none" onclick="if(event.target===this)closeEditPlaceModal()">
+  <div class="modal-box">
+    <h3>Editar lugar</h3>
+    <div class="modal-field">
+      <label>Nombre</label>
+      <div class="modal-icon-row">
+        <input type="text" id="editPlaceIcon" maxlength="2" style="width:48px;text-align:center;font-size:20px;padding:10px 6px">
+        <input type="text" id="editPlaceName" placeholder="Nombre del sitio">
+      </div>
+    </div>
+    <div class="modal-field">
+      <label>Descripción</label>
+      <textarea id="editPlaceInfo" rows="5" placeholder="Descripción, historia, horarios..."></textarea>
+    </div>
+    <div class="modal-field">
+      <label>Etiqueta (badge)</label>
+      <input type="text" id="editPlaceBadge" placeholder="Ej: Gratis · $25 · ⚠ Reserva">
+    </div>
+    <div class="modal-field">
+      <label>Coordenadas (opcional)</label>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="editPlaceLat" placeholder="Latitud">
+        <input type="text" id="editPlaceLng" placeholder="Longitud">
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeEditPlaceModal()">Cancelar</button>
+      <button class="btn-save" id="editSaveBtn" onclick="saveEditPlace()">Guardar</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
