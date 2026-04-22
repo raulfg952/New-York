@@ -303,7 +303,7 @@ const DAYS = [
         nearby: [{"n": "Macy's Herald Square", "type": "🛍 Gran almacén desde 1902", "note": "151 W 34th St, a 3 min andando. El gran almacén más grande del mundo en superficie — 200.000 m². Inaugurado en 1902, tiene 11 plantas. El desfile de Thanksgiving de Macy's existe desde 1924."}, {"n": "Num Pang Kitchen", "type": "🥖 Sándwiches cambodgeses", "note": "140 E 41st St. Sándwiches cambodgeses de culto en NYC — el de barriga de cerdo es legendario."}, {"n": "Los Tacos No. 1", "type": "🌮 Tacos", "note": "229 W 43rd St. Los mejores tacos de Midtown, tortillas hechas a mano."}]
       },
       { n: "Times Square", lat: 40.7580, lng: -73.9855, icon: "✦",
-        info: "Si preguntas por el lugar más popular de NY, sin duda es Times Square. Merece la pena visitarlo de día Y de noche — parecen dos lugares distintos. Si hubiéramos visitado NY antes de 1904, nadie hubiera situado Times Square, ya que no existía. Pero de repente llegó la primera línea de metro a la zona, comunicando el City Hall con Harlem haciendo parada aquí. Aprovechando la circunstancia, el periódico New York Times quiso trasladarse ahí, concretamente al One Times Square Building, para ocupar un lugar privilegiado para la distribución de su periódico. El editor exigió cambiar el nombre de la plaza — varias calles más abajo el New York Herald tenía su propia plaza. En los años 70 y 80, Times Square era la zona más peligrosa de la ciudad: prostitución, tráfico de drogas, sex shops. La transformación que la convirtió en lo que ves hoy fue una de las apuestas urbanísticas más arriesgadas de la historia moderna de Nueva York. La Torre One Times (25 pisos) fue sede del New York Times hasta 1912 y hoy acoge la bola del Año Nuevo — la tradición del ball drop existe desde 1907. La bola en sí tiene su origen en el edificio del 195 de Broadway, que tenía una bola en su tejado que cada mediodía bajaba como referencia horaria para los barcos del puerto. Solo ha habido dos años sin ball drop: 1942 y 1943, por la Segunda Guerra Mundial. La pantalla digital más grande mide casi 100m de largo × 23m de alto. Entre las 23:57 y las 00:00 hay una exposición de arte digital sincronizada en todas las pantallas. Foto en las míticas escaleras rojas del TKTS. En la 46th con Broadway hay una rejilla en el suelo que vibra — obra de arte de Max Neuhaus llamada «Times Square» (lleva décadas ahí y casi nadie la oye con el ruido). En la 46th con la 7th está el Israel Miller's Shoe Store, donde estaba la agencia de Estelle (la representante de Joey en Friends). Ellen's Stardust Diner a 4 min: camareros actores que hacen show musical. The Knickerbocker Hotel fue el lugar donde se inventó el cóctel Martini, según la leyenda. Ver también la estación de metro de Times Square (42nd Street): interior digno de Broadway, lleno de obras de arte.",
+        info: "Si preguntas por el lugar más popular de NY, sin duda es Times Square. Merece la pena visitarlo de día Y de noche — parecen dos lugares distintos. Si hubiéramos visitado NY antes de 1904, nadie hubiera situado Times Square, ya que no existía. Pero de repente llegó la primera línea de metro a la zona, comunicando el City Hall con Harlem haciendo parada aquí. Aprovechando la circunstancia, el periódico New York Times quiso trasladarse ahí, concretamente al One Times Square Building, para ocupar un lugar privilegiado para la distribución de su periódico. El editor exigió cambiar el nombre de la plaza — varias calles más abajo el New York Herald tenía su propia plaza. En los años 70 y 80, Times Square era la zona más peligrosa de la ciudad: prostitución, tráfico de drogas, sex shops. La transformación que la convirtió en lo que ves hoy fue una de las apuestas urbanísticas más arriesgadas de la historia moderna de Nueva York. La Torre One Times (25 pisos) fue sede del New York Times hasta 1912 y hoy acoge la bola del Año Nuevo — la tradición del ball drop existe desde 1907. La bola tiene su origen en el edificio del 195 de Broadway, que tenía una bola en su tejado que cada mediodía bajaba como referencia horaria para los barcos del puerto. Solo ha habido dos años sin ball drop: 1942 y 1943, por la Segunda Guerra Mundial. La pantalla digital más grande mide casi 100m de largo × 23m de alto. Entre las 23:57 y las 00:00 hay una exposición de arte digital sincronizada en todas las pantallas. Foto en las míticas escaleras rojas del TKTS. En la 46th con Broadway hay una rejilla en el suelo que vibra — obra de arte de Max Neuhaus llamada «Times Square» (lleva décadas ahí y casi nadie la oye con el ruido). En la 46th con la 7th está el Israel Miller's Shoe Store, donde estaba la agencia de Estelle (la representante de Joey en Friends). Ellen's Stardust Diner a 4 min: camareros actores que hacen show musical. The Knickerbocker Hotel fue el lugar donde se inventó el cóctel Martini, según la leyenda. Ver también la estación de metro de Times Square (42nd Street): interior digno de Broadway, lleno de obras de arte.",
         badge: "Día + Noche",
         nearby: [{"n": "Ellen's Stardust Diner", "type": "🎭 Experiencia", "note": "1650 Broadway. Los camareros son actores aspirantes a Broadway y hacen show musical mientras sirven."}, {"n": "Masseria Caffé & Bakery", "type": "☕ Café", "note": "56 W 45th St. El mejor café y croissants de la zona según los locales."}, {"n": "Restaurant Row (46th St)", "type": "🍽 Cena", "note": "46th St entre 8th y 9th Ave. Más de 20 restaurantes en una manzana — italiana, francesa, japonesa, caribeña."}]
       },
@@ -800,7 +800,6 @@ let openPlace = -1;
 let ctxOpen = true;
 let customPlaces = JSON.parse(localStorage.getItem('customPlaces')||'[]');
 let expenses = JSON.parse(localStorage.getItem('expenses')||'{}');
-// editedPlaces: { "dayId-placeIdx": {n, icon, info, badge, lat, lng} }
 let editedPlaces = JSON.parse(localStorage.getItem('editedPlaces')||'{}');
 let editingPlace = null;
 let editingExp = null;
@@ -816,15 +815,13 @@ function save(){
 
 // ── INIT ───────────────────────────────────────────────────────────────────
 function applyEditedPlaces(){
-  // Apply any persisted edits to built-in places in DAYS
   Object.keys(editedPlaces).forEach(function(key){
     const parts = key.split('-');
     const dayId = parseInt(parts[0]);
     const placeIdx = parseInt(parts[1]);
     const day = DAYS.find(d => d.id === dayId);
     if(day && day.places[placeIdx]){
-      const edits = editedPlaces[key];
-      Object.assign(day.places[placeIdx], edits);
+      Object.assign(day.places[placeIdx], editedPlaces[key]);
     }
   });
 }
@@ -1749,11 +1746,12 @@ function saveEditPlace(){
       ...cp, n:p.n, icon:p.icon, info:p.info, badge:p.badge, lat:p.lat, lng:p.lng
     } : cp);
   } else {
-    // built-in place — persist edits to localStorage keyed by "dayId-placeIdx"
+    // built-in place — persist edits keyed by "dayId-placeIdx"
     const key = day.id + '-' + idx;
     editedPlaces[key] = { n:p.n, icon:p.icon, info:p.info, badge:p.badge, lat:p.lat, lng:p.lng };
   }
   save();
+  // For built-in places, p is the object reference — mutation is direct
   closeEditPlaceModal();
   renderDay();
 }
