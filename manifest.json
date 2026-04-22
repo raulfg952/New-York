@@ -1,0 +1,19 @@
+{
+  "name": "Nueva York & Washington DC",
+  "short_name": "NYC & DC",
+  "description": "Guía de viaje NYC y Washington DC · 22–30 abril",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8f7f4",
+  "theme_color": "#378ADD",
+  "orientation": "portrait",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23378ADD'/><text y='.9em' font-size='80' x='10'>🗽</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
