@@ -800,6 +800,8 @@ let openPlace = -1;
 let ctxOpen = true;
 let customPlaces = JSON.parse(localStorage.getItem('customPlaces')||'[]');
 let expenses = JSON.parse(localStorage.getItem('expenses')||'{}');
+// editedPlaces: { "dayId-placeIdx": {n, icon, info, badge, lat, lng} }
+let editedPlaces = JSON.parse(localStorage.getItem('editedPlaces')||'{}');
 let editingPlace = null;
 let editingExp = null;
 let expCat = 'food';
@@ -809,10 +811,26 @@ let maps = {};
 function save(){
   localStorage.setItem('customPlaces', JSON.stringify(customPlaces));
   localStorage.setItem('expenses', JSON.stringify(expenses));
+  localStorage.setItem('editedPlaces', JSON.stringify(editedPlaces));
 }
 
 // ── INIT ───────────────────────────────────────────────────────────────────
+function applyEditedPlaces(){
+  // Apply any persisted edits to built-in places in DAYS
+  Object.keys(editedPlaces).forEach(function(key){
+    const parts = key.split('-');
+    const dayId = parseInt(parts[0]);
+    const placeIdx = parseInt(parts[1]);
+    const day = DAYS.find(d => d.id === dayId);
+    if(day && day.places[placeIdx]){
+      const edits = editedPlaces[key];
+      Object.assign(day.places[placeIdx], edits);
+    }
+  });
+}
+
 function init(){
+  applyEditedPlaces();
   buildNavPills();
   buildCatPills();
   buildAddDaySelect();
@@ -1730,9 +1748,12 @@ function saveEditPlace(){
     customPlaces = customPlaces.map(cp => cp.id===id ? {
       ...cp, n:p.n, icon:p.icon, info:p.info, badge:p.badge, lat:p.lat, lng:p.lng
     } : cp);
-    save();
+  } else {
+    // built-in place — persist edits to localStorage keyed by "dayId-placeIdx"
+    const key = day.id + '-' + idx;
+    editedPlaces[key] = { n:p.n, icon:p.icon, info:p.info, badge:p.badge, lat:p.lat, lng:p.lng };
   }
-  // For built-in places, p is the object reference — mutation is direct
+  save();
   closeEditPlaceModal();
   renderDay();
 }
